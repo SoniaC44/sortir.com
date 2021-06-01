@@ -30,7 +30,7 @@ class Sortie
     private $dateHeureDebut;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $duree;
 
@@ -62,21 +62,21 @@ class Sortie
     private $campus;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Participant::class, inversedBy="sorties")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $organisateur;
-
-    /**
-     * @ORM\ManyToMany(targetEntity=Participant::class, inversedBy="sorties")
-     */
-    private $participants;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Lieu::class, inversedBy="sorties")
      * @ORM\JoinColumn(nullable=false)
      */
     private $lieu;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Participant::class, inversedBy="sortiesInscrit")
+     */
+    private $participants;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Participant::class, inversedBy="sortiesOrganisees")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $organisateur;
 
     public function __construct()
     {
@@ -117,7 +117,7 @@ class Sortie
         return $this->duree;
     }
 
-    public function setDuree(int $duree): self
+    public function setDuree(?int $duree): self
     {
         $this->duree = $duree;
 
@@ -184,14 +184,14 @@ class Sortie
         return $this;
     }
 
-    public function getOrganisateur(): ?Participant
+    public function getLieu(): ?Lieu
     {
-        return $this->organisateur;
+        return $this->lieu;
     }
 
-    public function setOrganisateur(?Participant $organisateur): self
+    public function setLieu(?Lieu $lieu): self
     {
-        $this->organisateur = $organisateur;
+        $this->lieu = $lieu;
 
         return $this;
     }
@@ -220,14 +220,14 @@ class Sortie
         return $this;
     }
 
-    public function getLieu(): ?Lieu
+    public function getOrganisateur(): ?Participant
     {
-        return $this->lieu;
+        return $this->organisateur;
     }
 
-    public function setLieu(?Lieu $lieu): self
+    public function setOrganisateur(?Participant $organisateur): self
     {
-        $this->lieu = $lieu;
+        $this->organisateur = $organisateur;
 
         return $this;
     }
