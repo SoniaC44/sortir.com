@@ -22,9 +22,9 @@
         {% block body %}
 
             {%  if app.user %}
-                <a href="{{ path('app_logout') }}" title="Logout">Logout ({{ app.user.nom }})</a>
-            {% else %}
-                <a href="{{ path('app_login') }}" title="Login">Login</a>
+                <header>
+                    {% include("inc/_nav.html.twig") %}
+                </header>
             {% endif %}
 
         {% endblock %}

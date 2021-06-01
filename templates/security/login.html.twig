@@ -6,7 +6,7 @@
     <div class="container_fluid row justify-content-center align-items-center m-0 p-3 container_form_login">
         <form method="post" id="formulaire_login" class="col-sm-12 col-md-8 col-lg-6 col-xl-4">
             {% if error %}
-                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                <div class="alert alert-danger">Adresse mail ou mot de passe invalide.</div>
             {% endif %}
 
             {% if app.user %}
