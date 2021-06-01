@@ -110,6 +110,7 @@ class AppFixtures extends Fixture
         $part
             ->setNom('Marx')
             ->setPrenom('Karl')
+            ->setPseudo('KaMar007')
             ->setTelephone('06' . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT))
             ->setEmail('admin@admin.admin')
             ->setPassword($this->encoder->encodePassword($part, '123'))
@@ -121,13 +122,24 @@ class AppFixtures extends Fixture
 
 
         for ($i = 2; $i<24; $i++) {
-
             $part = new Participant();
+
+            //pour faire de jolis exemple avec le mail qui correspond aux noms et prenoms des participants
+            $nom = $faker->lastName;
+            $nomReduit = str_replace(' ','',$nom);
+            $prenom = $faker->firstName;
+            $prenomReduit = str_replace(' ','',$prenom);
+            $email = $faker->email;
+            $fin_email = substr($email, strpos($email,'@'));
+            $email = $prenomReduit.'.'.$nomReduit.$fin_email;
+            $pseudo =  $prenomReduit . substr($nomReduit, 0,3) . random_int(1,99);
+
             $part
-                ->setNom($faker->name)
-                ->setPrenom($faker->firstName)
+                ->setNom($nom)
+                ->setPrenom($prenom)
+                ->setPseudo($pseudo)
                 ->setTelephone('06' . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT))
-                ->setEmail($faker->email)
+                ->setEmail($email)
                 ->setPassword($this->encoder->encodePassword($part, '123'))
                 ->setAdministrateur(0)
                 ->setActif(1)
