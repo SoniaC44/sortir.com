@@ -1,0 +1,50 @@
+ {% extends 'base.html.twig' %}
+
+{% block title %}New Sortie{% endblock %}
+
+{% block body %}
+    <h1>Create new Sortie</h1>
+
+    {{ include('sortie/_form.html.twig') }}
+
+    <div id="map" style="width: 50%; height: 20%;"></div>
+
+    <a href="{{ path('sortie_index') }}">back to list</a>
+{% endblock %}
+
+{% block javascripts %}
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
+    <script type="application/javascript">
+        let marker;
+
+        window.addEventListener("DOMContentLoaded", function () {
+            mapboxgl.accessToken = 'pk.eyJ1IjoiYmFsYnV6YXJkIiwiYSI6ImNrcGR2eHBwMTFyc3MybnA3NWpkaGVjZWIifQ.68J9NxbIMvEWHFgRXma62g';
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11',
+                zoom: 4.5,
+                minZoom: 2,
+                center: [2.2, 46.4]
+            });
+
+            map.on('click', function(e) {
+                document.getElementById('sortie_lieu_longitude').value=e.lngLat.lng;
+                document.getElementById('sortie_lieu_latitude').value=e.lngLat.lat;
+
+                if (marker) {
+                    marker.remove();
+                }
+                marker = new mapboxgl.Marker({
+                    color: "#FF5555",
+                    draggable: true
+                }).setLngLat([e.lngLat.lng, e.lngLat.lat])
+                    .addTo(map);
+
+            });
+
+
+        })
+
+
+    </script>
+{% endblock %}

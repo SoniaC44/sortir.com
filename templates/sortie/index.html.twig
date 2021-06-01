@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sortie index{% endblock %}
+
+{% block body %}
+    <h1>Sortie index</h1>
+
+    {{ app.user.nom }}
+    {{ "now"|date("d/m/Y") }}
+
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nom de la sortie</th>
+                <th>Date de la sortie</th>
+                <th>Clôture</th>
+                <th>NbInscriptionsMax</th>
+                <th>InfosSortie</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for sortie in sorties %}
+            <tr>
+                <td>{{ sortie.nom }}</td>
+                <td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('Y-m-d') : '' }}</td>
+                <td>{{ sortie.nbInscriptionsMax }}</td>
+                <td>{{ sortie.infosSortie }}</td>
+                <td>
+                    <a href="{{ path('sortie_show', {'id': sortie.id}) }}">show</a>
+                    <a href="{{ path('sortie_edit', {'id': sortie.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {{  form_start(form) }}
+    {{ form_widget(form) }}
+    <button type="submit" class="btn btn-outline-dark">{{ button_label|default('Enregistrer') }}</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('sortie_new') }}">Create new</a>
+{% endblock %}

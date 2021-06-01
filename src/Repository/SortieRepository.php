@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Sortie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use http\Client\Curl\User;
 
 /**
  * @method Sortie|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,6 +19,60 @@ class SortieRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Sortie::class);
+    }
+
+     /**
+      * @return Sortie[] Returns an array of Sortie objects
+      */
+    public function findByFilters($data): array
+    {
+        $queryBuilder = $this->createQueryBuilder('s');
+           /* ->select('', '')
+            ->join()*/
+        if (!empty($data->mot)) {
+            $queryBuilder
+                ->andWhere('s.nom LIKE :mot' )
+                ->setParameter('mot', "%{$data->mot}%") ;
+        }
+        if (!empty($data->campus->getId())) {
+            $queryBuilder
+                ->andWhere('s.campus = :id' )
+                ->setParameter('id', $data->campus->getId()) ;
+        }
+        if (!empty($data->dateMin)) {
+            $queryBuilder
+                ->andWhere('s.dateHeureDebut <= :date' )
+                ->setParameter('date', $data->dateMin) ;
+        }
+        if (!empty($data->dateMax)) {
+            $queryBuilder
+                ->andWhere('s.dateHeureDebut >= :date' )
+                ->setParameter('date', $data->dateMax) ;
+        }
+        if ($data->passee) {
+            $queryBuilder
+                ->andWhere('s.etat = :passee' )
+                ->setParameter('passee', 5) ;
+        }
+       /* if (!($data->inscrit)) {
+            $queryBuilder
+                ->andWhere('s.campus = :val' )
+                ->setParameter('val', $data->campus) ;
+        }
+        if (!($data->nonInscrit)) {
+            $queryBuilder
+                ->andWhere('s.campus = :val' )
+                ->setParameter('val', $data->campus) ;
+        }*/
+        if ($data->organisee) {
+            $queryBuilder
+                ->andWhere('s.organisateur = :id' )
+                ->setParameter('id', $data->user ) ;
+        }
+        $queryBuilder
+            ->addOrderBy('s.dateHeureDebut');
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     // /**
