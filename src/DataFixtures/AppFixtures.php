@@ -119,6 +119,10 @@ class AppFixtures extends Fixture
             ->setCampus($this->getReference('campus-'. rand(1,10)));
         $this->setReference('part-'. 1, $part);
         $manager->persist($part);
+        $manager->flush();
+        //gestion creation nom image de profil
+        $image = $part->getId() . '.png';
+        $part->setImageProfil($image);
 
 
         for ($i = 2; $i<24; $i++) {
@@ -126,13 +130,13 @@ class AppFixtures extends Fixture
 
             //pour faire de jolis exemple avec le mail qui correspond aux noms et prenoms des participants
             $nom = $faker->lastName;
-            $nomReduit = str_replace(' ','',$nom);
+            $nomReduit = str_replace(' ', '', $nom);
             $prenom = $faker->firstName;
-            $prenomReduit = str_replace(' ','',$prenom);
+            $prenomReduit = str_replace(' ', '', $prenom);
             $email = $faker->email;
-            $fin_email = substr($email, strpos($email,'@'));
-            $email = $prenomReduit.'.'.$nomReduit.$fin_email;
-            $pseudo =  $prenomReduit . substr($nomReduit, 0,3) . random_int(1,99);
+            $fin_email = substr($email, strpos($email, '@'));
+            $email = $prenomReduit . '.' . $nomReduit . $fin_email;
+            $pseudo = $prenomReduit . substr($nomReduit, 0, 3) . random_int(1, 99);
 
             $part
                 ->setNom($nom)
@@ -143,11 +147,17 @@ class AppFixtures extends Fixture
                 ->setPassword($this->encoder->encodePassword($part, '123'))
                 ->setAdministrateur(0)
                 ->setActif(1)
-                ->setCampus($this->getReference('campus-'. rand(1,10)));
-            $this->setReference('part-'.$i, $part);
+                ->setCampus($this->getReference('campus-' . rand(1, 10)));
+            $this->setReference('part-' . $i, $part);
             $manager->persist($part);
+            $manager->flush();
+            //petit if car que 12 images versionnées et 24 participants
+            if ($part->getId() > 12) {
+                $image = $part->getId() - 12 . '.png';
+            }
+            else $image = $part->getId() . '.png';
+            $part->setImageProfil($image);
         }
-        $manager->flush();
     }
 
     /**

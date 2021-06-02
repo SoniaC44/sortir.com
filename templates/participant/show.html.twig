@@ -2,53 +2,53 @@
 
 {% block title %}Participant{% endblock %}
 
-{% block body %}
-    <h1>Participant</h1>
+{% block main %}
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ participant.id }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ participant.email }}</td>
-            </tr>
-            <tr>
-                <th>Roles</th>
-                <td>{{ participant.roles ? participant.roles|json_encode : '' }}</td>
-            </tr>
-            <tr>
-                <th>Password</th>
-                <td>{{ participant.password }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ participant.nom }}</td>
-            </tr>
-            <tr>
-                <th>Prenom</th>
-                <td>{{ participant.prenom }}</td>
-            </tr>
-            <tr>
-                <th>Telephone</th>
-                <td>{{ participant.telephone }}</td>
-            </tr>
-            <tr>
-                <th>Administrateur</th>
-                <td>{{ participant.administrateur ? 'Yes' : 'No' }}</td>
-            </tr>
-            <tr>
-                <th>Actif</th>
-                <td>{{ participant.actif ? 'Yes' : 'No' }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="page_form_profil row col-sm-12 col-lg-10 p-3">
+        {#{{ include('participant/_form.html.twig', {'button_label': 'Update'}) }} #}
 
-    <a href="{{ path('participant_index') }}">back to list</a>
+        {# {% form_theme form 'bootstrap_4_layout.html.twig' %} #}
+        <div class="col-12 text-center mb-4">
+            <h1>{{ participant.pseudo }}</h1>
+        </div>
+        <div class="col-sm-12 col-lg-4 text-center">
+            <img class="imageProfil" src="{{ asset('uploads/imagesProfil/' ~ participant.imageProfil) }}" alt="photo de {{ participant.pseudo }}">
+        </div>
+        <div class="col-sm-12 col-lg-8">
 
-    <a href="{{ path('participant_edit', {'id': participant.id}) }}">edit</a>
+            <table class="table">
+                <tr>
+                    <th>Prenom</th>
+                    <td>{{ participant.prenom }}</td>
+                </tr>
+                <tr>
+                    <th>Nom</th>
+                    <td>{{ participant.nom }}</td>
+                </tr>
+                <tr>
+                    <th>Telephone</th>
+                    <td>{{ participant.telephone }}</td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td>{{ participant.email }}</td>
+                </tr>
+                <tr>
+                    <th>Campus</th>
+                    <td>{{ participant.campus.nom }}</td>
+                </tr>
+            </table>
 
-    {{ include('participant/_delete_form.html.twig') }}
+        </div>
+
+        <div class="row mt-3 col-12 text-center">
+            <a href="{{ path('main_home') }}">
+                <button class="btn btn-secondary">Retour</button>
+            </a>
+        </div>
+
+        </div>
+
+    </div>
+
 {% endblock %}

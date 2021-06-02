@@ -12,3 +12,38 @@ body{
     padding: 15px;
     background-color: #f1f2f3;
 }
+
+/************************** mon profil **********************************/
+.page_form_profil label{
+    margin-top: 10px;
+}
+
+/************************************* MEDIA QUERIES *****************************/
+
+@media all and (min-width:0px){
+    .imageProfil{
+        width: 50%;
+        height: auto;
+    }
+}
+
+@media all and (min-width:768px){
+    .imageProfil{
+        width: 40%;
+        height: auto;
+    }
+}
+
+@media all and (min-width:992px){
+    .imageProfil{
+        width: 90%;
+        height: auto;
+    }
+}
+
+@media all and (min-width:1200px){
+    .imageProfil{
+        width: 70%;
+        height: auto;
+    }
+}

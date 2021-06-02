@@ -9,14 +9,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
- * @Route("/participant")
+ * @Route("/participant", name="participant_")
  */
 class ParticipantController extends AbstractController
 {
     /**
-     * @Route("/", name="participant_index", methods={"GET"})
+     * @Route("/", name="index", methods={"GET"})
      */
     public function index(ParticipantRepository $participantRepository): Response
     {
@@ -26,7 +30,7 @@ class ParticipantController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="participant_new", methods={"GET","POST"})
+     * @Route("/new", name="new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
     {
@@ -49,7 +53,7 @@ class ParticipantController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="participant_show", methods={"GET"})
+     * @Route("/{id}", name="show", methods={"GET"})
      */
     public function show(Participant $participant): Response
     {
@@ -59,27 +63,59 @@ class ParticipantController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/edit", name="participant_edit", methods={"GET","POST"})
+     * @Route("/{id}/profil", name="profil", methods={"GET","POST"}, requirements={"id"="\d+"})
      */
-    public function edit(Request $request, Participant $participant): Response
+    public function edit(Request $request, Participant $participant, UserPasswordEncoderInterface $encoder, SluggerInterface $slugger): Response
     {
-        $form = $this->createForm(ParticipantType::class, $participant);
-        $form->handleRequest($request);
+        $user = $this->getUser();
+        if($user && $user->getId() == $participant->getId()){
+            $form = $this->createForm(ParticipantType::class, $participant);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
 
-            return $this->redirectToRoute('participant_index');
+                $mdp = $form->get('motDePasse')->getData();
+
+                if($mdp){
+                    $hash = $encoder->encodePassword($participant, $mdp);
+                    $participant->setPassword($hash);
+                }
+
+                $imageProfil = $form->get('imageProfil')->getData();
+
+                if ($imageProfil) {
+
+                    $newFilename = $participant->getId().'.'. $imageProfil->guessExtension();
+
+                    // Move the file to the directory where brochures are stored
+                    try {
+                        $imageProfil->move(
+                            $this->getParameter('image_profil_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        // ... handle exception if something happens during file upload
+                    }
+
+                    $participant->setImageProfil($newFilename);
+                }
+
+                $this->getDoctrine()->getManager()->flush();
+
+                return $this->redirectToRoute('main_home');
+            }
+
+            return $this->render('participant/edit.html.twig', [
+                'participant' => $participant,
+                'form' => $form->createView(),
+            ]);
+        }else{
+            return $this->redirectToRoute('main_home');
         }
-
-        return $this->render('participant/edit.html.twig', [
-            'participant' => $participant,
-            'form' => $form->createView(),
-        ]);
     }
 
     /**
-     * @Route("/{id}", name="participant_delete", methods={"POST"})
+     * @Route("/{id}", name="delete", methods={"POST"})
      */
     public function delete(Request $request, Participant $participant): Response
     {

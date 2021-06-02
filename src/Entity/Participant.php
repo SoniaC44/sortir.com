@@ -6,11 +6,14 @@ use App\Repository\ParticipantRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ParticipantRepository::class)
+ * @UniqueEntity(fields={"pseudo"}, message="Ce pseudo est déjà utilisé. Veuillez en choisir un autre.")
+ * @UniqueEntity(fields={"email"}, message="Cette adresse mail est déjà utilisée. Veuillez en choisir une autre.")
  */
 class Participant implements UserInterface
 {
@@ -23,6 +26,7 @@ class Participant implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\Email(message="Email invalide")
      */
     private $email;
 
@@ -39,16 +43,21 @@ class Participant implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Assert\NotBlank()
+     * @Assert\Length(max="50", maxMessage="Votre nom est trop long (50 caractères maximum")
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Assert\NotBlank()
+     * @Assert\Length(max="50", maxMessage="Votre prénom est trop long (50 caractères maximum")
      */
     private $prenom;
 
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
+     * @Assert\Length(max="10", maxMessage="Numéro de téléphone invalide (10 caractères maximum")
      */
     private $telephone;
 
@@ -80,9 +89,13 @@ class Participant implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=50, unique=true)
-     * @Assert\Unique()
      */
     private $pseudo;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $imageProfil;
 
     public function __construct()
     {
@@ -144,10 +157,11 @@ class Participant implements UserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(?string $password): self
     {
-        $this->password = $password;
-
+        if($password){
+            $this->password = $password;
+        }
         return $this;
     }
 
@@ -309,6 +323,17 @@ class Participant implements UserInterface
     {
         $this->pseudo = $pseudo;
 
+        return $this;
+    }
+
+    public function getImageProfil(): ?string
+    {
+        return $this->imageProfil;
+    }
+
+    public function setImageProfil($imageProfil): self
+    {
+        $this->imageProfil = $imageProfil;
         return $this;
     }
 

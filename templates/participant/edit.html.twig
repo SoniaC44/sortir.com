@@ -2,12 +2,34 @@
 
 {% block title %}Edit Participant{% endblock %}
 
-{% block body %}
-    <h1>Edit Participant</h1>
+{% block main %}
 
-    {{ include('participant/_form.html.twig', {'button_label': 'Update'}) }}
+    <div class="page_form_profil row col-sm-12 col-lg-10 p-3">
+    {#{{ include('participant/_form.html.twig', {'button_label': 'Update'}) }} #}
 
-    <a href="{{ path('participant_index') }}">back to list</a>
+    {# {% form_theme form 'bootstrap_4_layout.html.twig' %} #}
+        <div class="col-12 text-center mb-3">
+            <h1>Mon Profil</h1>
+        </div>
+        <div class="col-sm-12 col-lg-4 text-center">
+            <img class="imageProfil" src="{{ asset('uploads/imagesProfil/' ~ participant.imageProfil) }}" alt="photo de {{ participant.pseudo }}">
+        </div>
+        <div class="col-sm-12 col-lg-8">
+            {{ form_errors(form) }}
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <button class="btn btn-secondary" type="submit">Enregistrer</button>
+                    <a href="{{ path('main_home') }}">
+                        <button class="btn btn-secondary">Annuler</button>
+                    </a>
+                </div>
+            </div>
 
-    {{ include('participant/_delete_form.html.twig') }}
+            {{ form_end(form) }}
+        </div>
+
+    </div>
+
 {% endblock %}
