@@ -91,4 +91,5 @@ class ParticipantController extends AbstractController
 
         return $this->redirectToRoute('participant_index');
     }
+
 }

@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Data\RechercheData;
+use App\Entity\Participant;
 use App\Entity\Sortie;
 use App\Form\RechercheSortieType;
 use App\Form\SortieType;
 use App\Repository\CampusRepository;
+use App\Repository\ParticipantRepository;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,8 +24,10 @@ class SortieController extends AbstractController
     /**
      * @Route("/", name="sortie_index", methods={"GET","POST"})
      */
-    public function index(SortieRepository $sortieRepository, CampusRepository $campusRepository, Request $request): Response
+    public function index(SortieRepository $sortieRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
     {
+
+
 
         $data = new RechercheData();
         $data->user = $this->getUser()->getId();
@@ -32,6 +36,10 @@ class SortieController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
+
+            $participant = $participantRepository->find($data->user);
+            $sortiesInscrits = $participant->getSortiesInscrit();
+            dd($sortiesInscrits);
 
             return $this->render('sortie/index.html.twig', [
                 'sorties' => $sortieRepository->findByFilters($data),
@@ -113,5 +121,14 @@ class SortieController extends AbstractController
         }
 
         return $this->redirectToRoute('sortie_index');
+    }
+
+    public function findByInscrit($data, ParticipantRepository $participantRepository) {
+        $SortiesOfUser = null;
+
+        if (!empty($data->user)) {
+            $participant = $participantRepository->find($data->user);
+            dd($participant);
+        }
     }
 }

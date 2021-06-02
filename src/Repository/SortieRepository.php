@@ -3,10 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Sortie;
+use App\Repository\ParticipantRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use http\Client\Curl\User;
+
 
 /**
  * @method Sortie|null find($id, $lockMode = null, $lockVersion = null)
@@ -27,8 +28,6 @@ class SortieRepository extends ServiceEntityRepository
     public function findByFilters($data): array
     {
         $queryBuilder = $this->createQueryBuilder('s');
-           /* ->select('', '')
-            ->join()*/
         if (!empty($data->mot)) {
             $queryBuilder
                 ->andWhere('s.nom LIKE :mot' )
@@ -54,16 +53,16 @@ class SortieRepository extends ServiceEntityRepository
                 ->andWhere('s.etat = :passee' )
                 ->setParameter('passee', 5) ;
         }
-       /* if (!($data->inscrit)) {
+        if (!($data->inscrit)) {
             $queryBuilder
-                ->andWhere('s.campus = :val' )
-                ->setParameter('val', $data->campus) ;
+                ->andWhere(' i.participant = :id' )
+                ->setParameter('id', $data->user) ;
         }
         if (!($data->nonInscrit)) {
             $queryBuilder
                 ->andWhere('s.campus = :val' )
                 ->setParameter('val', $data->campus) ;
-        }*/
+        }
         if ($data->organisee) {
             $queryBuilder
                 ->andWhere('s.organisateur = :id' )
@@ -74,6 +73,9 @@ class SortieRepository extends ServiceEntityRepository
 
         return $queryBuilder->getQuery()->getResult();
     }
+
+
+
 
     // /**
     //  * @return Sortie[] Returns an array of Sortie objects
