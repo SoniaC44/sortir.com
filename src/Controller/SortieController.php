@@ -24,8 +24,9 @@ class SortieController extends AbstractController
     /**
      * @Route("/", name="sortie_index", methods={"GET","POST"})
      */
-    public function index(SortieRepository $sortieRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
+    public function index( SortieRepository $sortieRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
     {
+
         $data = new RechercheData();
 
         $form = $this->createForm(RechercheSortieType::class, $data);
@@ -74,10 +75,26 @@ class SortieController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="sortie_show", methods={"GET"})
+     * @Route("/{id}/{action}", name="sortie_show", methods={"GET"})
      */
-    public function show(Sortie $sortie): Response
+    public function show(Sortie $sortie, $action = 0): Response
     {
+        if($action) {
+            switch ($action){
+                case 1:
+                    actionSeDesister();
+                    break;
+                case 2:
+                    actionSInscrire();
+                    break;
+                case 3:
+                    actionAnnuler();
+                    break;
+            }
+
+            return $this->redirectToRoute('sortie_index');
+        }
+
         return $this->render('sortie/show.html.twig', [
             'sortie' => $sortie,
         ]);
@@ -130,14 +147,5 @@ class SortieController extends AbstractController
             }
         }
         return $sorties;
-    }
-
-    public function findByInscrit($data, ParticipantRepository $participantRepository) {
-        $SortiesOfUser = null;
-
-        if (!empty($data->user)) {
-            $participant = $participantRepository->find($data->user);
-            dd($participant);
-        }
     }
 }

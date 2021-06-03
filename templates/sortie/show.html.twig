@@ -81,13 +81,6 @@
             <div class="col-sm-12 col-lg-7">{{ sortie.lieu.longitude }}</div>
         </div>
     </div>
-    <div class="col-12 d-flex justify-content-center my-3">
-        {% if sortie.dateLimiteInscription >= date() and sortie.participants|length < sortie.nbInscriptionsMax %}
-            <a href="{{ path('sortie_sinscrire', {'id':sortie.id}) }}" class="d-grid gap-2">
-                <button class="btn btn-secondary">S'inscrire</button>
-            </a>
-        {% endif %}
-    </div>
     <div class="col-sm-12 col-lg-6 mb-3">
         <div class="col-12">
             <h3>Liste des participants :</h3>
