@@ -33,10 +33,12 @@ class SortieRepository extends ServiceEntityRepository
                 ->andWhere('s.nom LIKE :mot' )
                 ->setParameter('mot', "%{$data->mot}%") ;
         }
-        if (!empty($data->campus->getId())) {
-            $queryBuilder
-                ->andWhere('s.campus = :id' )
-                ->setParameter('id', $data->campus->getId()) ;
+        if (!empty($data->campus)) {
+            if (!empty($data->campus->getId())) {
+                $queryBuilder
+                    ->andWhere('s.campus = :id')
+                    ->setParameter('id', $data->campus->getId());
+            }
         }
         if (!empty($data->dateMin)) {
             $queryBuilder
@@ -48,33 +50,37 @@ class SortieRepository extends ServiceEntityRepository
                 ->andWhere('s.dateHeureDebut >= :date' )
                 ->setParameter('date', $data->dateMax) ;
         }
+        //cases à cocher
         if ($data->passee) {
             $queryBuilder
                 ->andWhere('s.etat = :passee' )
                 ->setParameter('passee', 5) ;
         }
-        if (!($data->inscrit)) {
+
+         if ($data->inscrit) {
             $queryBuilder
-                ->andWhere(' i.participant = :id' )
-                ->setParameter('id', $data->user) ;
+                ->leftJoin('s.participants', 'p')
+                ->addSelect('p')
+                ->andWhere('p.id = :id')
+                ->setParameter('id', $data->user);
         }
-        if (!($data->nonInscrit)) {
+        if ($data->nonInscrit) {
             $queryBuilder
-                ->andWhere('s.campus = :val' )
-                ->setParameter('val', $data->campus) ;
+                ->leftJoin('s.participants', 'p')
+                ->addSelect('p')
+                ->andWhere('p.id != :id')
+                ->setParameter('id', $data->user);
         }
         if ($data->organisee) {
             $queryBuilder
                 ->andWhere('s.organisateur = :id' )
-                ->setParameter('id', $data->user ) ;
+                ->setParameter('id', $data->user) ;
         }
         $queryBuilder
             ->addOrderBy('s.dateHeureDebut');
 
         return $queryBuilder->getQuery()->getResult();
     }
-
-
 
 
     // /**

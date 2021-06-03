@@ -26,31 +26,24 @@ class SortieController extends AbstractController
      */
     public function index(SortieRepository $sortieRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
     {
-
-
-
         $data = new RechercheData();
-        $data->user = $this->getUser()->getId();
 
         $form = $this->createForm(RechercheSortieType::class, $data);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-
-            $participant = $participantRepository->find($data->user);
-            $sortiesInscrits = $participant->getSortiesInscrit();
-            dd($sortiesInscrits);
+            $data->user = $this->getUser();
 
             return $this->render('sortie/index.html.twig', [
-                'sorties' => $sortieRepository->findByFilters($data),
+                'sorties' => $this->getInscriptions($sortieRepository->findByFilters($data)),
                 'campus' => $campusRepository->findAll(),
                 'form' => $form->createView(),
             ]);
         }
 
-
         return $this->render('sortie/index.html.twig', [
-            'sorties' => $sortieRepository->findAll(),
+            'sorties' => $this->getInscriptions($sortieRepository->findAll()),
             'campus' => $campusRepository->findAll(),
             'form' => $form->createView(),
         ]);
@@ -64,6 +57,7 @@ class SortieController extends AbstractController
         $sortie = new Sortie();
         $form = $this->createForm(SortieType::class, $sortie);
         $form->handleRequest($request);
+        $sortie->setCampus($this->getUser()->getCampus());
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
@@ -121,6 +115,21 @@ class SortieController extends AbstractController
         }
 
         return $this->redirectToRoute('sortie_index');
+    }
+
+    public function getInscriptions($sorties) {
+        foreach ($sorties as $sortie) {
+            $participants = $sortie->getParticipants();
+            $sortie->nbInscrits = $participants->count();
+            $sortie->isInscrit = false;
+
+            foreach ($participants as $part) {
+                if ($part == $this->getUser() ) {
+                    $sortie->isInscrit = true;
+                }
+            }
+        }
+        return $sorties;
     }
 
     public function findByInscrit($data, ParticipantRepository $participantRepository) {

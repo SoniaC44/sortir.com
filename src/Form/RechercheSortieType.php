@@ -26,7 +26,7 @@ class RechercheSortieType extends AbstractType
                 'class' => Campus::class,
                 'choice_label' => 'nom',
                 'label' => 'Campus :',
-                'required' => false
+                'required' => false,
             ])
             ->add('dateMin', DateType::class, [
                 'label' => 'Entre',
@@ -39,7 +39,11 @@ class RechercheSortieType extends AbstractType
             ])
             ->add('mot', SearchType::class, [
                 'label' => 'Le nom de la sortie contient:',
-                'required' => false
+                'required' => false,
+                'attr' => [
+                    'placeholder' => '🔍 search'
+                ]
+
             ])
             ->add('passee', CheckboxType::class, [
                 'label' => 'Sorties passées',
@@ -67,6 +71,7 @@ class RechercheSortieType extends AbstractType
             'data_class' => RechercheData::class,
             'method' => 'GET',
             'crsf_protection' => false
+
         ]);
     }
 
