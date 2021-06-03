@@ -36,6 +36,11 @@ class ParticipantRepository extends ServiceEntityRepository implements PasswordU
         $this->_em->flush();
     }
 
+    public function test()
+    {
+
+    }
+
     // /**
     //  * @return Participant[] Returns an array of Participant objects
     //  */
