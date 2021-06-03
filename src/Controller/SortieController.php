@@ -160,15 +160,31 @@ class SortieController extends AbstractController
 
     public function actionSInscrire(Sortie $sortie){
 
-        if($sortie->getEtat() == 2){
+        if($sortie->getEtat()->getId() == 2){
             $user = $this->getUser();
-            $sortie->addParticipant($user);
 
-            $message = "vous êtes inscrit à la sortie : " . $sortie->getNom();
-            $this->addFlash("success", $message);
+            //on vérifie que l'user n'est pas déjà inscrit
+            if(!$sortie->getParticipants()->contains($user))
+            {
+                if($sortie->getOrganisateur()->getId() == $user->getId())
+                {
+                    $message = "Vous êtes l'organisateur de cette sortie : " . $sortie->getNom();
+                    $this->addFlash("warning", $message);
+                }
+                else{
+                    $sortie->addParticipant($user);
+                    $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute('sortie_index');
+                    $message = "Vous êtes maintenant inscrit à la sortie : " . $sortie->getNom();
+                    $this->addFlash("success", $message);
+                }
+            }
+            else{
+                    $message = "Vous êtes déjà inscrit à cette sortie : " . $sortie->getNom();
+                $this->addFlash("danger", $message);
+            }
         }
+        return $this->redirectToRoute('sortie_index');
     }
 
     private function actionAnnuler(Sortie $sortie)
