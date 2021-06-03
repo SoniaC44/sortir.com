@@ -29,7 +29,7 @@ class ParticipantController extends AbstractController
         ]);
     }
 
-    /**
+     /**
      * @Route("/new", name="new", methods={"GET","POST"})
      */
     public function new(Request $request): Response
