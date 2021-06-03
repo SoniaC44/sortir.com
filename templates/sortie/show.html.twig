@@ -2,45 +2,143 @@
 
 {% block title %}Sortie{% endblock %}
 
-{% block body %}
-    <h1>Sortie</h1>
+{#
+{% block javascripts %}
+    {{ parent() }}
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js'></script>
+    <script type="application/javascript">
+        let marker;
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ sortie.id }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ sortie.nom }}</td>
-            </tr>
-            <tr>
-                <th>DateHeureDebut</th>
-                <td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Duree</th>
-                <td>{{ sortie.duree }}</td>
-            </tr>
-            <tr>
-                <th>DateLimiteInscription</th>
-                <td>{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>NbInscriptionsMax</th>
-                <td>{{ sortie.nbInscriptionsMax }}</td>
-            </tr>
-            <tr>
-                <th>InfosSortie</th>
-                <td>{{ sortie.infosSortie }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('sortie_index') }}">back to list</a>
-
-    <a href="{{ path('sortie_edit', {'id': sortie.id}) }}">edit</a>
-
-    {{ include('sortie/_delete_form.html.twig') }}
+        window.addEventListener("DOMContentLoaded", function () {
+            mapboxgl.accessToken = 'pk.eyJ1IjoiYmFsYnV6YXJkIiwiYSI6ImNrcGR2eHBwMTFyc3MybnA3NWpkaGVjZWIifQ.68J9NxbIMvEWHFgRXma62g';
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11',
+                zoom: 9,
+                minZoom: 2,
+                center: [{{ sortie.lieu.longitude }}, {{ sortie.lieu.latitude }}]
+            });
+        })
+    </script>
 {% endblock %}
+#}
+
+{% block main %}
+
+<div class="row col-sm-12 col-lg-10 p-2">
+    <div class="col-12 text-center mb-4">
+        <h1>Afficher une sortie</h1>
+    </div>
+    <div class="col-sm-12 col-lg-6 tableau_sortie px-3">
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Nom de la sortie :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.nom }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Date et heure de la sortie :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y à H:i') : '' }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Date limite d'inscription :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y') }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Nombre de places :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.nbInscriptionsMax }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Durée :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.duree }} minutes</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Description et infos :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.infosSortie }}</div>
+        </div>
+    </div>
+    <div class="col-sm-12 col-lg-6 tableau_sortie px-3">
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Campus :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.campus.nom|upper }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Lieu :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.nom }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Rue :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.rue }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Ville :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.ville.codePostal }} {{ sortie.lieu.ville.nom|upper }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Latitude :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.latitude }}</div>
+        </div>
+        <div class="row col-12 mb-2">
+            <div class="col-sm-12 col-lg-5 libelle">Longitude :</div>
+            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.longitude }}</div>
+        </div>
+    </div>
+    <div class="col-12 d-flex justify-content-center my-3">
+        {% if sortie.dateLimiteInscription >= date() and sortie.participants|length < sortie.nbInscriptionsMax %}
+            <a href="{{ path('sortie_sinscrire', {'id':sortie.id}) }}" class="d-grid gap-2">
+                <button class="btn btn-secondary">S'inscrire</button>
+            </a>
+        {% endif %}
+    </div>
+    <div class="col-sm-12 col-lg-6 mb-3">
+        <div class="col-12">
+            <h3>Liste des participants :</h3>
+        </div>
+        <div class="col-12 wrapper">
+            {% if sortie.participants|length == 0%}
+                <div>Il n'y a pas encore d'inscrits à cette sortie !</div>
+            {% else %}
+                <table class="col-12 table">
+                    <tr>
+                        <th>Pseudo</th>
+                        <th>Prénom & Nom</th>
+                    </tr>
+                    {% for part in sortie.participants %}
+                        <tr>
+                            <td><a href="{{ path('participant_show', {'id' : part.id}) }}">{{ part.pseudo }}</a></td>
+                            <td>{{ part.prenom }} {{ part.nom|upper }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-sm-12 col-lg-6" id="divMap">
+        <div id="map"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="application/javascript">
+        let marker;
+
+        window.addEventListener("DOMContentLoaded", function () {
+            mapboxgl.accessToken = 'pk.eyJ1IjoiYmFsYnV6YXJkIiwiYSI6ImNrcGR2eHBwMTFyc3MybnA3NWpkaGVjZWIifQ.68J9NxbIMvEWHFgRXma62g';
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11',
+                zoom: 9,
+                minZoom: 1,
+                center: [{{ sortie.lieu.longitude }}, {{ sortie.lieu.latitude }}]
+            });
+
+            marker = new mapboxgl.Marker({
+                color: "#FF5555",
+                draggable: false
+            }).setLngLat([{{ sortie.lieu.longitude }}, {{ sortie.lieu.latitude }}]).addTo(map);
+        })
+    </script>
+{% endblock %}
+
+
