@@ -29,6 +29,10 @@ class SortieController extends AbstractController
 
         $data = new RechercheData();
 
+
+        if ($data->campus == null){
+            $data->campus = $campusRepository->find($this->getUser()->getCampus());
+        }
         $form = $this->createForm(RechercheSortieType::class, $data);
 
         $form->handleRequest($request);
@@ -79,16 +83,19 @@ class SortieController extends AbstractController
      */
     public function show(Sortie $sortie, $action = 0): Response
     {
+
         if($action) {
             switch ($action){
                 case 1:
-                    actionSeDesister();
+                    $this->actionSeDesister($sortie);
                     break;
                 case 2:
                     actionSInscrire();
                     break;
                 case 3:
-                    actionAnnuler();
+                    $this->actionAnnuler($sortie);
+                    break;
+                default:
                     break;
             }
 
@@ -125,15 +132,18 @@ class SortieController extends AbstractController
      */
     public function delete(Request $request, Sortie $sortie): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$sortie->getId(), $request->request->get('_token'))) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($sortie);
-            $entityManager->flush();
-        }
+       if ($sortie->getOrganisateur() == $this->getUser()) {
+           if ($this->isCsrfTokenValid('delete'.$sortie->getId(), $request->request->get('_token'))) {
+               $entityManager = $this->getDoctrine()->getManager();
+               $entityManager->remove($sortie);
+               $entityManager->flush();
+           }
+       }
 
         return $this->redirectToRoute('sortie_index');
     }
 
+    // Récupère le nombre d'inscrits par sortie et vérifie que notre User est inscrit
     public function getInscriptions($sorties) {
         foreach ($sorties as $sortie) {
             $participants = $sortie->getParticipants();
@@ -148,4 +158,21 @@ class SortieController extends AbstractController
         }
         return $sorties;
     }
+
+    // Contrôle de la date limite de clôture des inscriptions + si déjà inscrit
+    public function actionSeDesister($sortie) {
+
+        $participants = $sortie->getParticipants();
+        if ($sortie->getDateLimiteInscription() >= date_create('now')->format('Y-m-d H:i:s')) {
+            foreach ($participants as $part) {
+                if ($part == $this->getUser() ) {
+                    $sortie->removeParticipant($this->getUser());
+                    $entityManager = $this->getDoctrine()->getManager();
+                    $entityManager->persist($sortie);
+                    $entityManager->flush();
+                }
+            }
+        }
+    }
+
 }

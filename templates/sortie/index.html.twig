@@ -45,11 +45,11 @@
                     {% if not sortie.isInscrit and "now"|date("Y-m-d") < sortie.dateLimiteInscription|date("Y-m-d")  and sortie.organisateur.id != app.user.id %}
                         <a href="{{ path('sortie_show', {'id': sortie.id, 'action': 2}) }}">S'inscrire</a>
                     {% endif %}
-                    {% if sortie.etat.id == 1 %}
+                    {% if sortie.etat.id == 1 and sortie.organisateur.id == app.user.id %}
                         <a href="{{ path('sortie_show', {'id': sortie.id}) }}">Modifier - Publier</a>
                     {% endif %}
-                    {% if sortie.etat.id == 2 and date() < sortie.dateLimiteInscription|date() and sortie.organisateur.id == app.user.id  %}
-                        <a href="{{ path('sortie_show', {'id': sortie.id, 'action': 3}) }}">Annuler</a>
+                    {% if sortie.etat.id == 2 and "now"|date("Y-m-d") < sortie.dateLimiteInscription|date("Y-m-d") and sortie.organisateur.id == app.user.id  %}
+                        <a href="{{ path('sortie_show', {'id': sortie.id}) }}">Annuler</a>
                     {% endif %}
 
                 </td>
