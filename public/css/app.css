@@ -18,6 +18,41 @@ body{
     margin-top: 10px;
 }
 
+/************************** afficher une sortie **********************************/
+.tableau_sortie .libelle{
+    font-weight: bold;
+}
+
+.wrapper {
+    overflow:hidden;
+    overflow-y: scroll;
+    // change this to desired height
+    border: 1px solid grey;
+}
+.wrapper table{
+    border-collapse: collapse;
+    min-height: 250px;
+}
+.wrapper table tr:nth-child(even){background-color: #f2f2f2;}
+
+.wrapper table tr:hover {background-color: #ddd;}
+
+.wrapper table th{
+    background-color: lightgrey;
+}
+
+.wrapper table, .wrapper th, .wrapper td {
+    border: 1px solid black;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+}
+
+#map{
+    height: 100%;
+    min-height: 300px;
+}
+
 /************************************* MEDIA QUERIES *****************************/
 
 @media all and (min-width:0px){
@@ -38,6 +73,9 @@ body{
     .imageProfil{
         width: 90%;
         height: auto;
+    }
+    #divMap{
+        margin-left: 0.5rem;
     }
 }
 
