@@ -27,8 +27,6 @@ class SortieController extends AbstractController
     public function index(SortieRepository $sortieRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
     {
 
-
-
         $data = new RechercheData();
         $data->user = $this->getUser()->getId();
 
