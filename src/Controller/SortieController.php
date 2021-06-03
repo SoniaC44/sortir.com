@@ -24,7 +24,7 @@ class SortieController extends AbstractController
     /**
      * @Route("/", name="sortie_index", methods={"GET","POST"})
      */
-    public function index(SortieRepository $sortieRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
+    public function index( SortieRepository $sortieRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
     {
 
         $data = new RechercheData();
@@ -75,9 +75,9 @@ class SortieController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="sortie_show", methods={"GET"})
+     * @Route("/{id}/{action}", name="sortie_show", methods={"GET"})
      */
-    public function show(Sortie $sortie,int $action = 0): Response
+    public function show(Sortie $sortie, $action = 0): Response
     {
         if($action) {
             switch ($action){
