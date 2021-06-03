@@ -77,8 +77,24 @@ class SortieController extends AbstractController
     /**
      * @Route("/{id}", name="sortie_show", methods={"GET"})
      */
-    public function show(Sortie $sortie): Response
+    public function show(Sortie $sortie,int $action = 0): Response
     {
+        if($action) {
+            switch ($action){
+                case 1:
+                    $this->actionSeDesister($sortie);
+                    break;
+                case 2:
+                    $this->actionSInscrire($sortie);
+                    break;
+                case 3:
+                    $this->actionAnnuler($sortie);
+                    break;
+            }
+
+            return $this->redirectToRoute('sortie_index');
+        }
+
         return $this->render('sortie/show.html.twig', [
             'sortie' => $sortie,
         ]);
@@ -140,5 +156,26 @@ class SortieController extends AbstractController
             $participant = $participantRepository->find($data->user);
             dd($participant);
         }
+    }
+
+    public function actionSInscrire(Sortie $sortie){
+
+        if($sortie->getEtat() == 2){
+            $user = $this->getUser();
+            $sortie->addParticipant($user);
+
+            $message = "vous êtes inscrit à la sortie : " . $sortie->getNom();
+            $this->addFlash("success", $message);
+
+            return $this->redirectToRoute('sortie_index');
+        }
+    }
+
+    private function actionAnnuler(Sortie $sortie)
+    {
+    }
+
+    private function actionSeDesister(Sortie $sortie)
+    {
     }
 }
