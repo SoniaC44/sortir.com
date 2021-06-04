@@ -226,7 +226,8 @@ class SortieController extends AbstractController
                             //si participants = nombre max on cloture la sortie
                             if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax()){
 
-                                $sortie->setEtat(3);
+                                $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
+                                $sortie->setEtat($etatRepository->find(3));
                             }
 
                             $this->getDoctrine()->getManager()->flush();
