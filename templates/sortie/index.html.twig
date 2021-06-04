@@ -2,8 +2,12 @@
 
 {% block title %}Sortie index{% endblock %}
 
-{% block body %}
-    <h1>Sortie index</h1>
+{% block main %}
+<div class="row col-sm-12 col-lg-10 p-3">
+    <div class="col-12 text-center mb-4">
+        <h1>Sortie index</h1>
+    </div>
+
 
     {{ app.user.prenom }} {{ app.user.nom|first }}.
     {{ "now"|date("d/m/Y") }}
@@ -69,4 +73,5 @@
     {{ form_end(form) }}
 
     <a href="{{ path('sortie_new') }}">Créer une sortie</a>
+</div>
 {% endblock %}
