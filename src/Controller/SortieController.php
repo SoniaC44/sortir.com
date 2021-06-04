@@ -3,13 +3,18 @@
 namespace App\Controller;
 
 use App\Data\RechercheData;
+use App\Entity\Etat;
 use App\Entity\Participant;
 use App\Entity\Sortie;
 use App\Form\RechercheSortieType;
 use App\Form\SortieType;
 use App\Repository\CampusRepository;
+use App\Repository\EtatRepository;
 use App\Repository\ParticipantRepository;
 use App\Repository\SortieRepository;
+use Cassandra\Date;
+use DateInterval;
+use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -72,6 +77,16 @@ class SortieController extends AbstractController
             'sortie' => $sortie,
             'form' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/maj", name="sortie_maj", methods={"GET"})
+     */
+    public function mettreAJourSorties(SortieRepository $sortieRepository, EtatRepository $etatRepository): Response {
+        $this->cloturerLesSorties($sortieRepository, $etatRepository);
+        $this->archiverLesSorties($sortieRepository, $etatRepository);
+
+        return $this->redirectToRoute('sortie_index');
     }
 
     /**
@@ -158,30 +173,53 @@ class SortieController extends AbstractController
         }
     }
 
-    public function actionSInscrire(Sortie $sortie){
+    private function actionSInscrire(Sortie $sortie){
 
         if($sortie->getEtat()->getId() == 2){
             $user = $this->getUser();
 
-            //on vérifie que l'user n'est pas déjà inscrit
-            if(!$sortie->getParticipants()->contains($user))
-            {
-                if($sortie->getOrganisateur()->getId() == $user->getId())
+            //en premier lieu on vérifie l'etat de la sortie qui doit etre ouverte pour pouvoir s'inscrire
+            if($sortie->getEtat() == 2){
+
+                //on vérifie que l'user n'est pas déjà inscrit
+                if(!$sortie->getParticipants()->contains($user))
                 {
-                    $message = "Vous êtes l'organisateur de cette sortie : " . $sortie->getNom();
-                    $this->addFlash("warning", $message);
+                    if($sortie->getOrganisateur()->getId() == $user->getId())
+                    {
+                        $message = "Vous êtes l'organisateur de cette sortie : " . $sortie->getNom();
+                        $this->addFlash("warning", $message);
+                    }
+                    else{
+
+                        //on vérifie le nombre d'inscrit
+                        //normalement pas de lien vers l'inscription
+                        if($sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()){
+
+                            $sortie->addParticipant($user);
+
+                            //si participants = nombre max on cloture la sortie
+                            if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax()){
+
+                                $sortie->setEtat(3);
+                            }
+
+                            $this->getDoctrine()->getManager()->flush();
+
+                            $message = "Vous êtes maintenant inscrit à la sortie : " . $sortie->getNom();
+                            $this->addFlash("success", $message);
+
+                        }else{
+
+                            $message = "La sortie : '" . $sortie->getNom() . "' a déjà atteint son nombre de participants maximum.";
+                            $this->addFlash("danger", $message);
+                        }
+                    }
                 }
                 else{
-                    $sortie->addParticipant($user);
-                    $this->getDoctrine()->getManager()->flush();
 
-                    $message = "Vous êtes maintenant inscrit à la sortie : " . $sortie->getNom();
-                    $this->addFlash("success", $message);
-                }
-            }
-            else{
                     $message = "Vous êtes déjà inscrit à cette sortie : " . $sortie->getNom();
-                $this->addFlash("danger", $message);
+                    $this->addFlash("danger", $message);
+                }
             }
         }
         return $this->redirectToRoute('sortie_index');
@@ -194,4 +232,111 @@ class SortieController extends AbstractController
     private function actionSeDesister(Sortie $sortie)
     {
     }
+
+    //methode qui modifie l'etat d'une sortie pour l'archiver selon certaines conditions
+    private function archiverLesSorties(SortieRepository $sortieRepository, EtatRepository $etatRepository){
+
+        $sorties = $sortieRepository->findAll();
+
+        $today = date_create('now');
+
+        foreach($sorties as $sortie) {
+
+            //on archive les sorties terminées ou annulées après un mois
+            if ($sortie->getEtat()->getId() == 5 || $sortie->getEtat()->getId() == 6) {
+
+                $dateSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d'));
+                $datePlus1Month = date_add($dateSortie, date_interval_create_from_date_string('1 month'));
+
+                if ($datePlus1Month < $today) {
+                    $sortie->setEtat($etatRepository->find(7));
+                }
+            }
+        }
+
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->redirectToRoute('sortie_index');
+    }
+
+    //methode qui modifie l'etat d'une sortie pour la cloturer selon certaines conditions
+    private function cloturerLesSorties(SortieRepository $sortieRepository, EtatRepository $etatRepository){
+
+        $sorties = $sortieRepository->findAll();
+
+        $today = date_create('now');
+
+        foreach($sorties as $sortie)
+        {
+            //on cloture les sorties ouvertes
+            if($sortie->getEtat()->getId() == 2){
+
+                //on vérifie pour chaque sortie le nombre d'inscrits
+                //normalement vérification faite lors de l'inscription
+                if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax())
+                {
+                    $sortie->setEtat($etatRepository->find(3));
+                }
+
+                //si le nombre d'inscrits est inférieur au nombre max on vérifie la date limite
+                if($sortie->getDateLimiteInscription() < $today )
+                {
+                    $sortie->setEtat($etatRepository->find(3));
+                }
+            }
+        }
+
+        $this->getDoctrine()->getManager()->flush();
+
+        return $this->redirectToRoute('sortie_index');
+    }
+
+    private function MettreAJourActivite(SortieRepository $sortieRepository, EtatRepository $etatRepository){
+
+        //TODO à finir !! vérifier les comparaisons de date
+
+        $sorties = $sortieRepository->findAll();
+
+        $maintenant = new DateTime('now');
+        $today = date_create((new DateTime('now'))->format('Y-m-d'));
+
+        foreach($sorties as $sortie) {
+
+            //pour qu'on modifie l'activité à en cours ou terminée il faut vérifier l'etat
+            //la sortie doit être à ouverte ou cloturée
+            if ($sortie->getEtat()->getId() == 2 || $sortie->getEtat()->getId() == 3) {
+
+                $jourSortie  = date_create($sortie->getDateHeureDebut()->format('Y-m-d'));
+                $heureSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d HH:mm'));
+
+                //on compare la date du jour avec la date de sortie
+                if ( $jourSortie == $today && $heureSortie < $maintenant){
+
+                    //sortie en cours
+                    $sortie->setEtat($etatRepository->find(4));
+                }
+            }
+
+            //l'activité ne doit ni être annulée ni archivée ni non publiée
+            //pour passer à activité terminée si la date de l'activité est passée
+            if($sortie->getEtat() != 6 && $sortie->getEtat() != 7 && $sortie->getEtat() != 1) {
+
+                $jourSortie  = date_create($sortie->getDateHeureDebut()->format('Y-m-d'));
+                $debutSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d HH:mm'));
+
+                $intervalString = "PT" . $sortie->getDuree(). "M";
+                $duree = new DateInterval($intervalString);
+
+                $heureFinSortie = date_add($debutSortie,$duree);
+
+                if ($jourSortie < $today || ($jourSortie == $today && $heureFinSortie < $maintenant)){
+
+                    //sortie en cours
+                    $sortie->setEtat($etatRepository->find(5));
+                }
+
+            }
+        }
+    }
+
 }

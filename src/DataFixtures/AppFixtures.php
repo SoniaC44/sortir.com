@@ -44,7 +44,7 @@ class AppFixtures extends Fixture
 
     public function loadEtat(ObjectManager $manager)
     {
-        $etat_name = ['Créée', 'Ouverte', 'Clôturée', 'Activité en cours', 'Passée', 'Annulée'];
+        $etat_name = ['Créée', 'Ouverte', 'Clôturée', 'Activité en cours', 'Activité passée', 'Annulée', 'archivée'];
         foreach ($etat_name as $kn => $name) {
             $etat = new Etat();
             $etat->setLibelle($name);
@@ -167,29 +167,56 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        for ($i = 1; $i<26; $i++) {
+        for ($i = 1; $i<36; $i++) {
             $startDate = null;
-            $etat = 1;
-            if ($i <= 10){
+            if ($i <= 5){
                 $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = '+ 60 days', $timezone = 'Europe/Paris');
+                //etat = créée = non publiée
+                $etat = 0;
 
-            } elseif ($i >= 11 && $i <= 16){
+            }elseif ($i >= 6 && $i <= 10){
+                $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = '+ 60 days', $timezone = 'Europe/Paris');
+                //etat = ouverte = crée + publiée
+                $etat = 1;
+
+            } elseif ($i >= 11 && $i <= 15){
                 $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = 'now', $timezone = 'Europe/Paris');
+                //etat = en cours
                 $etat = 3;
 
-            } elseif ($i >= 17 && $i <= 25 ) {
+            } elseif ($i >= 16 && $i <= 20 ) {
+                $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = '+ 60 days', $timezone = 'Europe/Paris');
+                //etat = cloturée
+                $etat = 2;
+
+            } elseif ($i >= 21 && $i <= 25 ) {
                 $startDate = $faker->dateTimeBetween($startDate = '- 29 days', $endDate = '- 1 days', $timezone = 'Europe/Paris');
+                //etat = terminée
                 $etat = 4;
 
+            } elseif ($i >= 26 && $i <= 30 ) {
+                $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = '+ 60 days', $timezone = 'Europe/Paris');
+                //etat = annulée
+                $etat = 5;
+
+            } elseif ($i >= 31 && $i <= 35 ) {
+
+                $startDate = $faker->dateTimeBetween($startDate = '- 75 days', $endDate = '- 30 days', $timezone = 'Europe/Paris');
+                //etat = archivée
+                $etat = 6;
+
             }
+
             $limitDate = date_format($startDate, 'Y-m-d');
+            $limitDate = new \DateTime($limitDate);
+            $limitDate->sub(date_interval_create_from_date_string('15 days'));
 
             $sortie = new Sortie();
             $sortie
                 ->setNom($faker->text(45))
                 ->setDateHeureDebut($startDate)
                 ->setDuree(rand(5, 360))
-                ->setDateLimiteInscription(new \DateTime($limitDate))
+                ->setDateLimiteInscription($limitDate)
                 ->setNbInscriptionsMax(rand(2,25))
                 ->setInfosSortie($faker->text(100))
                 ->setEtat($this->getReference('etat-'.$etat))
