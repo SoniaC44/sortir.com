@@ -174,5 +174,4 @@ class SortieController extends AbstractController
             }
         }
     }
-
 }
