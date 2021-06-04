@@ -105,14 +105,14 @@ class SortieController extends AbstractController
                     $this->actionSeDesister($sortie);
                     break;
                 case 2:
-                    $this->actionSInscrire($sortie);
+                    actionSInscrire();
                     break;
                 case 3:
                     $this->actionAnnuler($sortie);
 
                     break;
-                default:
 
+                default:
                     break;
             }
 
@@ -176,7 +176,6 @@ class SortieController extends AbstractController
         return $sorties;
     }
 
-
     // Contrôle de la date limite de clôture des inscriptions + si déjà inscrit
     public function actionSeDesister($sortie) {
 
@@ -191,7 +190,5 @@ class SortieController extends AbstractController
                 }
             }
         }
-
     }
-
 }
