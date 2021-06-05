@@ -118,14 +118,16 @@ class AppFixtures extends Fixture
             ->setActif(1)
             ->setCampus($this->getReference('campus-'. rand(1,10)));
         $this->setReference('part-'. 1, $part);
-        $manager->persist($part);
-        $manager->flush();
+
         //gestion creation nom image de profil
-        $image = $part->getId() . '.png';
+        $image = '1.png';
         $part->setImageProfil($image);
 
+        $manager->persist($part);
+        $manager->flush();
 
-        for ($i = 2; $i<24; $i++) {
+
+        for ($i = 2; $i<13; $i++) {
             $part = new Participant();
 
             //pour faire de jolis exemple avec le mail qui correspond aux noms et prenoms des participants
@@ -149,14 +151,12 @@ class AppFixtures extends Fixture
                 ->setActif(1)
                 ->setCampus($this->getReference('campus-' . rand(1, 10)));
             $this->setReference('part-' . $i, $part);
+
+            $image = $i . '.png';
+            $part->setImageProfil($image);
+
             $manager->persist($part);
             $manager->flush();
-            //petit if car que 12 images versionnées et 24 participants
-            if ($part->getId() > 12) {
-                $image = $part->getId() - 12 . '.png';
-            }
-            else $image = $part->getId() . '.png';
-            $part->setImageProfil($image);
         }
     }
 
@@ -167,39 +167,39 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        for ($i = 1; $i<36; $i++) {
+        for ($i = 1; $i<22; $i++) {
             $startDate = null;
-            if ($i <= 5){
+            if ($i <= 3){
                 $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = '+ 60 days', $timezone = 'Europe/Paris');
                 //etat = créée = non publiée
                 $etat = 0;
 
-            }elseif ($i >= 6 && $i <= 10){
+            }elseif ($i >= 4 && $i <= 9){
                 $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = '+ 60 days', $timezone = 'Europe/Paris');
                 //etat = ouverte = crée + publiée
                 $etat = 1;
 
-            } elseif ($i >= 11 && $i <= 15){
+            } elseif ($i >= 10 && $i <= 12){
                 $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = 'now', $timezone = 'Europe/Paris');
                 //etat = en cours
                 $etat = 3;
 
-            } elseif ($i >= 16 && $i <= 20 ) {
+            } elseif ($i >= 13 && $i <= 15) {
                 $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = '+ 60 days', $timezone = 'Europe/Paris');
                 //etat = cloturée
                 $etat = 2;
 
-            } elseif ($i >= 21 && $i <= 25 ) {
+            } elseif ($i >= 16 && $i <= 18 ) {
                 $startDate = $faker->dateTimeBetween($startDate = '- 29 days', $endDate = '- 1 days', $timezone = 'Europe/Paris');
                 //etat = terminée
                 $etat = 4;
 
-            } elseif ($i >= 26 && $i <= 30 ) {
+            } elseif ($i >= 18 && $i <= 21 ) {
                 $startDate = $faker->dateTimeBetween($startDate = 'now', $endDate = '+ 60 days', $timezone = 'Europe/Paris');
                 //etat = annulée
                 $etat = 5;
 
-            } elseif ($i >= 31 && $i <= 35 ) {
+            } elseif ($i >= 22 && $i <= 25) {
 
                 $startDate = $faker->dateTimeBetween($startDate = '- 75 days', $endDate = '- 30 days', $timezone = 'Europe/Paris');
                 //etat = archivée
@@ -221,8 +221,55 @@ class AppFixtures extends Fixture
                 ->setInfosSortie($faker->text(100))
                 ->setEtat($this->getReference('etat-'.$etat))
                 ->setCampus($this->getReference('campus-'. rand(1,10)))
-                ->setOrganisateur($this->getReference('part-'. rand(1,23)))
+                ->setOrganisateur($this->getReference('part-'. rand(1,12)))
                 ->setLieu($this->getReference('lieu-'.rand(1,10)));
+
+            //on va remplir la liste de participants
+            if($sortie->getEtat()->getId() != 1){
+
+                $part = $this->getReference('part-'. rand(1,12));
+                if(!$sortie->getParticipants()->contains($part) && $part->getId() != $sortie->getOrganisateur()->getId()) {
+                    $sortie->addParticipant($part);
+                }
+
+                $part = $this->getReference('part-'. rand(1,12));
+                if(!$sortie->getParticipants()->contains($part) && $part->getId() != $sortie->getOrganisateur()->getId()) {
+                    $sortie->addParticipant($part);
+                }
+
+                $part = $this->getReference('part-'. rand(1,12));
+                if(!$sortie->getParticipants()->contains($part)
+                    && $part->getId() != $sortie->getOrganisateur()->getId()
+                    && $sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()) {
+                    $sortie->addParticipant($part);
+                }
+
+                $part = $this->getReference('part-'. rand(1,12));
+                if(!$sortie->getParticipants()->contains($part)
+                    && $part->getId() != $sortie->getOrganisateur()->getId()
+                    && $sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()) {
+                    $sortie->addParticipant($part);
+                }
+
+                $part = $this->getReference('part-'. rand(1,12));
+                if(!$sortie->getParticipants()->contains($part)
+                    && $part->getId() != $sortie->getOrganisateur()->getId()
+                    && $sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()) {
+                    $sortie->addParticipant($part);
+                }
+
+                $part = $this->getReference('part-'. rand(1,12));
+                if(!$sortie->getParticipants()->contains($part)
+                    && $part->getId() != $sortie->getOrganisateur()->getId()
+                    && $sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()) {
+                    $sortie->addParticipant($part);
+                }
+            }
+
+            if($sortie->getEtat()->getId() == 2 && $sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax()){
+                $sortie->setEtat($this->getReference('etat-2'));
+            }
+
             $manager->persist($sortie);
         }
         $manager->flush();
