@@ -106,11 +106,12 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
+        //admin
         $part = new Participant();
         $part
             ->setNom('Marx')
             ->setPrenom('Karl')
-            ->setPseudo('KaMar007')
+            ->setPseudo('Admin01')
             ->setTelephone('06' . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT))
             ->setEmail('admin@admin.admin')
             ->setPassword($this->encoder->encodePassword($part, '123'))
@@ -126,8 +127,29 @@ class AppFixtures extends Fixture
         $manager->persist($part);
         $manager->flush();
 
+        //user
+        $part = new Participant();
+        $part
+            ->setNom('Wayne')
+            ->setPrenom('Bruce')
+            ->setPseudo('Batman')
+            ->setTelephone('06' . str_pad(rand(0, 99999999), 8, '0', STR_PAD_LEFT))
+            ->setEmail('user@user.user')
+            ->setPassword($this->encoder->encodePassword($part, '123'))
+            ->setAdministrateur(0)
+            ->setActif(1)
+            ->setCampus($this->getReference('campus-'. rand(1,10)));
+        $this->setReference('part-'. 2, $part);
 
-        for ($i = 2; $i<13; $i++) {
+        //gestion creation nom image de profil
+        $image = 'batman.png';
+        $part->setImageProfil($image);
+
+        $manager->persist($part);
+        $manager->flush();
+
+
+        for ($i = 3; $i<14; $i++) {
             $part = new Participant();
 
             //pour faire de jolis exemple avec le mail qui correspond aux noms et prenoms des participants
