@@ -152,19 +152,27 @@ class SortieController extends AbstractController
      */
     public function edit(Request $request, Sortie $sortie): Response
     {
-        $form = $this->createForm(SortieType::class, $sortie);
-        $form->handleRequest($request);
+        //il faut être l'organisateur de la sortie pour pouvoir l'annuler
+        if($sortie->getOrganisateur() == $this->getUser())
+        {
+            $form = $this->createForm(SortieType::class, $sortie);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->getDoctrine()->getManager()->flush();
 
+                return $this->redirectToRoute('sortie_index');
+            }
+
+            return $this->render('sortie/edit.html.twig', [
+                'sortie' => $sortie,
+                'form' => $form->createView(),
+            ]);
+        }else{
+            $message = "Vous ne pouvez pas modifier une sortie dont vous n'êtes pas l'organisateur !";
+            $this->addFlash("danger", $message);
             return $this->redirectToRoute('sortie_index');
         }
-
-        return $this->render('sortie/edit.html.twig', [
-            'sortie' => $sortie,
-            'form' => $form->createView(),
-        ]);
     }
 
     /**
