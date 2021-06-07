@@ -100,8 +100,8 @@ class SortieController extends AbstractController
      */
     public function annulerSortie(Request $request, Sortie $sortie, EtatRepository $etatRepository)
     {
-        //il faut être l'organisateur de la sortie pour pouvoir l'annuler
-        if($sortie->getOrganisateur() == $this->getUser())
+        //il faut être l'organisateur de la sortie pour pouvoir l'annuler ou admin
+        if($sortie->getOrganisateur() == $this->getUser() || $this->getUser()->getAdministrateur())
         {
             //on ne peut annuler une sortie que si elle est à ouverte ou cloturée
             if($sortie->getEtat()->getId() == 2 || $sortie->getEtat()->getId() == 3){
