@@ -166,9 +166,7 @@ class SortieController extends AbstractController
         if($sortie->getOrganisateur() == $this->getUser())
         {
             //la sortie doit avoir un certain etat pour être modifiable :
-            if($sortie->getEtat()->getId() == 1 ||
-                $sortie->getEtat()->getId() == 2 ||
-                $sortie->getEtat()->getId() == 3)
+            if($sortie->getEtat()->getId() == 1)
             {
                 $form = $this->createForm(SortieType::class, $sortie);
                 $form->handleRequest($request);
