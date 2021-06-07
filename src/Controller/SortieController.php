@@ -339,6 +339,9 @@ class SortieController extends AbstractController
                 $message = "Vous êtes déjà inscrit à cette sortie : " . $sortie->getNom();
                 $this->addFlash("danger", $message);
             }
+        }else{
+            $message = "L'état de la sortie : '" . $sortie->getNom() . "' ne lui permet plus d'ajouter des participants.";
+            $this->addFlash("danger", $message);
         }
         return $this->redirectToRoute('sortie_index');
     }
@@ -360,12 +363,20 @@ class SortieController extends AbstractController
 
                 $message = "La sortie : '" . $sortie->getNom() . "' a bien été publiée.";
                 $this->addFlash("success", $message);
+
             }else{
+
                 $message = "La sortie : '" . $sortie->getNom() . "' n'a pas pu être publiée. La date de sortie et/ou la date de clotûre est/sont dépassée/s.";
                 $this->addFlash("danger", $message);
             }
-            return $this->redirectToRoute('sortie_index');
+
+        }else{
+
+            $message = "Vous ne pouvez pas modifier une sortie dont vous n'êtes pas l'organisateur !";
+            $this->addFlash("danger", $message);
         }
+
+        return $this->redirectToRoute('sortie_index');
     }
 
     //methode qui modifie l'etat d'une sortie pour l'archiver selon certaines conditions
