@@ -155,19 +155,31 @@ class SortieController extends AbstractController
         //il faut être l'organisateur de la sortie pour pouvoir la modifier
         if($sortie->getOrganisateur() == $this->getUser())
         {
-            $form = $this->createForm(SortieType::class, $sortie);
-            $form->handleRequest($request);
+            //la sortie doit avoir un certain etat pour être modifiable :
+            if($sortie->getEtat()->getId() == 1 ||
+                $sortie->getEtat()->getId() == 2 ||
+                $sortie->getEtat()->getId() == 3)
+            {
+                $form = $this->createForm(SortieType::class, $sortie);
+                $form->handleRequest($request);
 
-            if ($form->isSubmitted() && $form->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
+                if ($form->isSubmitted() && $form->isValid()) {
+                    $this->getDoctrine()->getManager()->flush();
 
+                    return $this->redirectToRoute('sortie_index');
+                }
+
+                return $this->render('sortie/edit.html.twig', [
+                    'sortie' => $sortie,
+                    'form' => $form->createView(),
+                ]);
+
+            }else{
+                $message = "Cette sortie n'est plus modifiable !";
+                $this->addFlash("danger", $message);
                 return $this->redirectToRoute('sortie_index');
             }
 
-            return $this->render('sortie/edit.html.twig', [
-                'sortie' => $sortie,
-                'form' => $form->createView(),
-            ]);
         }else{
             $message = "Vous ne pouvez pas modifier une sortie dont vous n'êtes pas l'organisateur !";
             $this->addFlash("danger", $message);
