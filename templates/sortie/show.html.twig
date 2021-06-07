@@ -29,59 +29,61 @@
     <div class="col-12 text-center mb-4">
         <h1>Afficher une sortie</h1>
     </div>
-    <div class="col-sm-12 col-lg-6 tableau_sortie px-3">
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Nom de la sortie :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.nom }}</div>
+    <div class="row col-12 mb-4">
+        <div class="col-sm-12 col-lg-6 tableau_sortie px-3">
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Nom de la sortie :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.nom }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Date et heure de la sortie :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y à H:i') : '' }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Date limite d'inscription :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y') }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Nombre de places :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.nbInscriptionsMax }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Durée :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.duree }} minutes</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Description et infos :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.infosSortie }}</div>
+            </div>
         </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Date et heure de la sortie :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y à H:i') : '' }}</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Date limite d'inscription :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y') }}</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Nombre de places :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.nbInscriptionsMax }}</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Durée :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.duree }} minutes</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Description et infos :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.infosSortie }}</div>
+        <div class="col-sm-12 col-lg-6 tableau_sortie px-3">
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Campus :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.campus.nom|upper }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Lieu :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.lieu.nom }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Rue :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.lieu.rue }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Ville :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.lieu.ville.codePostal }} {{ sortie.lieu.ville.nom|upper }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Latitude :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.lieu.latitude }}</div>
+            </div>
+            <div class="row col-12 mb-2">
+                <div class="col-sm-12 col-lg-5 libelle">Longitude :</div>
+                <div class="col-sm-12 col-lg-7">{{ sortie.lieu.longitude }}</div>
+            </div>
         </div>
     </div>
-    <div class="col-sm-12 col-lg-6 tableau_sortie px-3">
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Campus :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.campus.nom|upper }}</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Lieu :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.nom }}</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Rue :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.rue }}</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Ville :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.ville.codePostal }} {{ sortie.lieu.ville.nom|upper }}</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Latitude :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.latitude }}</div>
-        </div>
-        <div class="row col-12 mb-2">
-            <div class="col-sm-12 col-lg-5 libelle">Longitude :</div>
-            <div class="col-sm-12 col-lg-7">{{ sortie.lieu.longitude }}</div>
-        </div>
-    </div>
-    <div class="col-sm-12 col-lg-6 mb-3">
+    <div class="col-sm-12 col-lg-5 mb-3">
         <div class="col-12">
             <h3>Liste des participants :</h3>
         </div>
@@ -104,7 +106,7 @@
             {% endif %}
         </div>
     </div>
-    <div class="col-sm-12 col-lg-6" id="divMap">
+    <div class="col-sm-12 col-lg-6 mb-3" id="divMap">
         <div id="map"></div>
     </div>
 </div>

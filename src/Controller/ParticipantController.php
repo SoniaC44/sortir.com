@@ -102,6 +102,9 @@ class ParticipantController extends AbstractController
 
                 $this->getDoctrine()->getManager()->flush();
 
+                $message = "Votre profil a bien été mis à jour.";
+                $this->addFlash("success", $message);
+
                 return $this->redirectToRoute('main_home');
             }
 
