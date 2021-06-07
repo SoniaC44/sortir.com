@@ -2,15 +2,19 @@
 
 {% block title %}New Sortie{% endblock %}
 
-{% block body %}
-    {# Déplacer ds bloc main #}
+{% block main %}
     <h1>Create new Sortie</h1>
 
     {{ include('sortie/_form.html.twig') }}
 
     <div id="map" style="width: 50%; height: 20%;"></div>
-
+    <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#exampleModal2">+</button>
     <a href="{{ path('sortie_index') }}">back to list</a>
+
+
+
+
+
 {% endblock %}
 
 {% block javascripts %}

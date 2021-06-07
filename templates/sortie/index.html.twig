@@ -12,8 +12,6 @@
     {{ app.user.prenom }} {{ app.user.nom|first }}.
     {{ "now"|date("d/m/Y") }}
 
-
-
     <table class="table">
         <thead>
             <tr>
@@ -29,6 +27,7 @@
         </thead>
         <tbody>
         {% for sortie in sorties %}
+            {% if sortie.etat.id != 7 %}
             <tr>
                 <td>{{ sortie.nom }}</td>
                 <td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y H:i') : '' }}</td>
@@ -56,9 +55,9 @@
                         <a href="{{ path('sortie_show', {'id': sortie.id}) }}">Annuler</a>
                     {% endif %}
 
-
                 </td>
             </tr>
+            {% endif %}
         {% else %}
             <tr>
                 <td colspan="8">Il n'y a aucun résultat pour votre recherche</td>

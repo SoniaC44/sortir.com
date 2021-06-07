@@ -45,6 +45,7 @@ class SortieController extends AbstractController
         if ($form->isSubmitted()) {
             $data->user = $this->getUser();
 
+
             return $this->render('sortie/index.html.twig', [
                 'sorties' => $this->getInscriptions($sortieRepository->findByFilters($data)),
                 'campus' => $campusRepository->findAll(),
