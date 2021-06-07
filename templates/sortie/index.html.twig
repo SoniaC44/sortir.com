@@ -3,14 +3,35 @@
 {% block title %}Sortie index{% endblock %}
 
 {% block main %}
-<div class="row col-sm-12 col-lg-10 p-3">
-    <div class="col-12 text-center mb-4">
-        <h1>Sortie index</h1>
+<div class="container">
+    <div class="col align-self-end">
+        <span><strong>Date du jour : {{ "now"|date("d/m/Y") }}</strong></span>
+        <span><strong>Participant : {{ app.user.prenom }} {{ app.user.nom|first }}.</strong></span>
     </div>
+    <div class="row">
 
 
-    {{ app.user.prenom }} {{ app.user.nom|first }}.
-    {{ "now"|date("d/m/Y") }}
+        <div class="row col-12 mb-4">
+
+                {{  form_start(form) }}
+                <div class="col">
+                    <div>{{ form_row(form.campus) }}</div>
+                    <div>{{ form_row(form.mot) }}{{ form_row(form.dateMin) }}</div>
+                    <div>{{ form_row(form.dateMax) }}</div>
+                </div>
+                <div class="col">
+                    <div>{{ form_row(form.organisee) }}</div>
+                    <div>{{ form_row(form.inscrit) }}</div>
+                    <div>{{ form_row(form.nonInscrit) }}</div>
+                    <div>{{ form_row(form.passee) }}</div>
+                </div>
+                <div class="col">
+                    <div><button type="submit" class="btn btn-outline-dark">{{ button_label|default('Rechercher') }}</button></div>
+                    {{ form_end(form) }}
+                </div>
+
+        </div>
+
 
     <table class="table">
         <thead>
@@ -55,22 +76,18 @@
                         <a href="{{ path('sortie_show', {'id': sortie.id}) }}">Annuler</a>
                     {% endif %}
 
-                </td>
-            </tr>
-            {% endif %}
-        {% else %}
-            <tr>
-                <td colspan="8">Il n'y a aucun résultat pour votre recherche</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="8">Il n'y a aucun résultat pour votre recherche</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    {{  form_start(form) }}
-    {{ form_widget(form) }}
-    <button type="submit" class="btn btn-outline-dark">{{ button_label|default('Enregistrer') }}</button>
-    {{ form_end(form) }}
-
-    <a href="{{ path('sortie_new') }}">Créer une sortie</a>
+        <a href="{{ path('sortie_new') }}">Créer une sortie</a>
+    </div>
 </div>
 {% endblock %}
