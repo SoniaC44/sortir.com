@@ -102,43 +102,52 @@ class SortieController extends AbstractController
         //il faut être l'organisateur de la sortie pour pouvoir l'annuler
         if($sortie->getOrganisateur() == $this->getUser())
         {
-            $form = $this->createForm(AnnulerSortieType::class, $sortie);
-            $form->handleRequest($request);
+            //on ne peut annuler une sortie que si elle est à ouverte ou cloturée
+            if($sortie->getEtat()->getId() == 2 || $sortie->getEtat()->getId() == 3){
+                $form = $this->createForm(AnnulerSortieType::class, $sortie);
+                $form->handleRequest($request);
 
-            if ($form->isSubmitted()) {
-                //on vérifie le bouton qui soumet le form
-                $btName = $form->getClickedButton()->getName();
+                if ($form->isSubmitted()) {
+                    //on vérifie le bouton qui soumet le form
+                    $btName = $form->getClickedButton()->getName();
 
-                //si bouton annuler redirectToRoute
-                if($btName == "reset"){
-                    return $this->redirectToRoute('sortie_index');
-                }else{
-                    //sinon on vérifie le form
-                    if( $form->isValid()){
-
-                        //modif sortie
-                        $motif = $form->get('motif')->getData();
-
-                        if($motif){
-
-                            $sortie->setEtat($etatRepository->find(6));
-                            $sortie->setInfosSortie($motif);
-
-                            $this->getDoctrine()->getManager()->flush();
-
-                            $message = "La sortie a bien été annulée.";
-                            $this->addFlash("success", $message);
-
-                        }
+                    //si bouton annuler redirectToRoute
+                    if($btName == "reset"){
                         return $this->redirectToRoute('sortie_index');
+                    }else{
+                        //sinon on vérifie le form
+                        if( $form->isValid()){
+
+                            //modif sortie
+                            $motif = $form->get('motif')->getData();
+
+                            if($motif){
+
+                                $sortie->setEtat($etatRepository->find(6));
+                                $sortie->setInfosSortie($motif);
+
+                                $this->getDoctrine()->getManager()->flush();
+
+                                $message = "La sortie a bien été annulée.";
+                                $this->addFlash("success", $message);
+
+                            }
+                            return $this->redirectToRoute('sortie_index');
+                        }
                     }
                 }
+
+                return $this->render('sortie/cancel.html.twig', [
+                    'sortie' => $sortie,
+                    'form' => $form->createView(),
+                ]);
+
+            }else{
+                $message = "L'état de la sortie '". $sortie->getNom() ."' ne lui permet plus d'être modifiée !";
+                $this->addFlash("danger", $message);
+                return $this->redirectToRoute('sortie_index');
             }
 
-            return $this->render('sortie/cancel.html.twig', [
-                'sortie' => $sortie,
-                'form' => $form->createView(),
-            ]);
         }else{
             $message = "Vous ne pouvez pas annuler une sortie dont vous n'êtes pas l'organisateur !";
             $this->addFlash("danger", $message);
