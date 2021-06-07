@@ -199,54 +199,52 @@ class SortieController extends AbstractController
         }
     }
 
+    //methode qui ajoute un participant à la liste de participants d'une sortie si possible
     private function actionSInscrire(Sortie $sortie){
 
+        //en premier lieu on vérifie l'etat de la sortie qui doit etre ouverte pour pouvoir s'inscrire
         if($sortie->getEtat()->getId() == 2){
             $user = $this->getUser();
 
-            //en premier lieu on vérifie l'etat de la sortie qui doit etre ouverte pour pouvoir s'inscrire
-            if($sortie->getEtat() == 2){
-
-                //on vérifie que l'user n'est pas déjà inscrit
-                if(!$sortie->getParticipants()->contains($user))
+            //on vérifie que l'user n'est pas déjà inscrit
+            if(!$sortie->getParticipants()->contains($user))
+            {
+                if($sortie->getOrganisateur()->getId() == $user->getId())
                 {
-                    if($sortie->getOrganisateur()->getId() == $user->getId())
-                    {
-                        $message = "Vous êtes l'organisateur de cette sortie : " . $sortie->getNom();
-                        $this->addFlash("warning", $message);
-                    }
-                    else{
-
-                        //on vérifie le nombre d'inscrit
-                        //normalement pas de lien vers l'inscription
-                        if($sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()){
-
-                            $sortie->addParticipant($user);
-
-                            //si participants = nombre max on cloture la sortie
-                            if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax()){
-
-                                $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
-                                $sortie->setEtat($etatRepository->find(3));
-                            }
-
-                            $this->getDoctrine()->getManager()->flush();
-
-                            $message = "Vous êtes maintenant inscrit à la sortie : " . $sortie->getNom();
-                            $this->addFlash("success", $message);
-
-                        }else{
-
-                            $message = "La sortie : '" . $sortie->getNom() . "' a déjà atteint son nombre de participants maximum.";
-                            $this->addFlash("danger", $message);
-                        }
-                    }
+                    $message = "Vous êtes l'organisateur de cette sortie : " . $sortie->getNom();
+                    $this->addFlash("warning", $message);
                 }
                 else{
 
-                    $message = "Vous êtes déjà inscrit à cette sortie : " . $sortie->getNom();
-                    $this->addFlash("danger", $message);
+                    //on vérifie le nombre d'inscrit
+                    //normalement pas de lien vers l'inscription
+                    if($sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()){
+
+                        $sortie->addParticipant($user);
+
+                        //si participants = nombre max on cloture la sortie
+                        if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax()){
+
+                            $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
+                            $sortie->setEtat($etatRepository->find(3));
+                        }
+
+                        $this->getDoctrine()->getManager()->flush();
+
+                        $message = "Vous êtes maintenant inscrit à la sortie : " . $sortie->getNom();
+                        $this->addFlash("success", $message);
+
+                    }else{
+
+                        $message = "La sortie : '" . $sortie->getNom() . "' a déjà atteint son nombre de participants maximum.";
+                        $this->addFlash("danger", $message);
+                    }
                 }
+            }
+            else{
+
+                $message = "Vous êtes déjà inscrit à cette sortie : " . $sortie->getNom();
+                $this->addFlash("danger", $message);
             }
         }
         return $this->redirectToRoute('sortie_index');
