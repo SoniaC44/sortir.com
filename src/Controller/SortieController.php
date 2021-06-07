@@ -152,7 +152,7 @@ class SortieController extends AbstractController
      */
     public function edit(Request $request, Sortie $sortie): Response
     {
-        //il faut être l'organisateur de la sortie pour pouvoir l'annuler
+        //il faut être l'organisateur de la sortie pour pouvoir la modifier
         if($sortie->getOrganisateur() == $this->getUser())
         {
             $form = $this->createForm(SortieType::class, $sortie);
@@ -282,19 +282,29 @@ class SortieController extends AbstractController
                     //normalement pas de lien vers l'inscription
                     if($sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()){
 
-                        $sortie->addParticipant($user);
+                        //on vérifie la date limite d'inscription
+                        $dateJour = date_create('now');
 
-                        //si participants = nombre max on cloture la sortie
-                        if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax()){
+                        if($dateJour <= $sortie->getDateLimiteInscription())
+                        {
+                            $sortie->addParticipant($user);
 
-                            $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
-                            $sortie->setEtat($etatRepository->find(3));
+                            //si participants = nombre max on cloture la sortie
+                            if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax()){
+
+                                $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
+                                $sortie->setEtat($etatRepository->find(3));
+                            }
+
+                            $this->getDoctrine()->getManager()->flush();
+
+                            $message = "Vous êtes maintenant inscrit à la sortie : " . $sortie->getNom();
+                            $this->addFlash("success", $message);
+                        }else{
+
+                            $message = "La sortie : '" . $sortie->getNom() . "' est déjà clôturée. Vous ne pouvez pas vous y inscrire !";
+                            $this->addFlash("danger", $message);
                         }
-
-                        $this->getDoctrine()->getManager()->flush();
-
-                        $message = "Vous êtes maintenant inscrit à la sortie : " . $sortie->getNom();
-                        $this->addFlash("success", $message);
 
                     }else{
 
