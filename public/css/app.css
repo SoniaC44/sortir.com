@@ -28,6 +28,7 @@ body{
     overflow-y: scroll;
     // change this to desired height
     border: 1px solid grey;
+    height : 250px;
 }
 .wrapper table{
     border-collapse: collapse;
