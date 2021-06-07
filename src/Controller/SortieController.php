@@ -206,9 +206,6 @@ class SortieController extends AbstractController
                     $this->actionSInscrire($sortie);
                     break;
                 case 3:
-                    $this->actionAnnuler($sortie);
-                    break;
-                case 4:
                     $this->actionPublier($sortie);
                     break;
                 default:
