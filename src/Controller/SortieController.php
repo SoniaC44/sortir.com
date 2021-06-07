@@ -6,6 +6,7 @@ use App\Data\RechercheData;
 use App\Entity\Etat;
 use App\Entity\Participant;
 use App\Entity\Sortie;
+use App\Form\AnnulerSortieType;
 use App\Form\RechercheSortieType;
 use App\Form\SortieType;
 use App\Repository\CampusRepository;
@@ -94,35 +95,56 @@ class SortieController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/{action}", name="sortie_show", methods={"GET"})
+     * @Route("/{id}/cancel", name="sortie_cancel", methods={"GET","POST"})
      */
-    public function show(Sortie $sortie, $action = 0): Response
+    public function annulerSortie(Request $request, Sortie $sortie, EtatRepository $etatRepository)
     {
+        //il faut être l'organisateur de la sortie pour pouvoir l'annuler
+        if($sortie->getOrganisateur() == $this->getUser())
+        {
+            $form = $this->createForm(AnnulerSortieType::class, $sortie);
+            $form->handleRequest($request);
 
-        if($action) {
-            switch ($action){
-                case 1:
-                    $this->actionSeDesister($sortie);
-                    break;
-                case 2:
-                    $this->actionSInscrire($sortie);
-                    break;
-                case 3:
-                    $this->actionAnnuler($sortie);
-                    break;
-                case 4:
-                    $this->actionPublier($sortie);
-                    break;
-                default:
-                    break;
+            if ($form->isSubmitted()) {
+                //on vérifie le bouton qui soumet le form
+                $btName = $form->getClickedButton()->getName();
+
+                //si bouton annuler redirectToRoute
+                if($btName == "reset"){
+                    return $this->redirectToRoute('sortie_index');
+                }else{
+                    //sinon on vérifie le form
+                    if( $form->isValid()){
+
+                        //modif sortie
+                        $motif = $form->get('motif')->getData();
+
+                        if($motif){
+
+                            $sortie->setEtat($etatRepository->find(6));
+                            $sortie->setInfosSortie($motif);
+
+                            $this->getDoctrine()->getManager()->flush();
+
+                            $message = "La sortie a bien été annulée.";
+                            $this->addFlash("success", $message);
+
+                        }
+                        return $this->redirectToRoute('sortie_index');
+                    }
+                }
             }
 
+            return $this->render('sortie/cancel.html.twig', [
+                'sortie' => $sortie,
+                'form' => $form->createView(),
+            ]);
+        }else{
+            $message = "Vous ne pouvez pas annuler une sortie dont vous n'êtes pas l'organisateur !";
+            $this->addFlash("danger", $message);
             return $this->redirectToRoute('sortie_index');
         }
 
-        return $this->render('sortie/show.html.twig', [
-            'sortie' => $sortie,
-        ]);
     }
 
     /**
@@ -159,6 +181,38 @@ class SortieController extends AbstractController
        }
 
         return $this->redirectToRoute('sortie_index');
+    }
+
+    /**
+     * @Route("/{id}/{action}", name="sortie_show", methods={"GET"})
+     */
+    public function show(Sortie $sortie, $action = 0): Response
+    {
+
+        if($action) {
+            switch ($action){
+                case 1:
+                    $this->actionSeDesister($sortie);
+                    break;
+                case 2:
+                    $this->actionSInscrire($sortie);
+                    break;
+                case 3:
+                    $this->actionAnnuler($sortie);
+                    break;
+                case 4:
+                    $this->actionPublier($sortie);
+                    break;
+                default:
+                    break;
+            }
+
+            return $this->redirectToRoute('sortie_index');
+        }
+
+        return $this->render('sortie/show.html.twig', [
+            'sortie' => $sortie,
+        ]);
     }
 
     // Récupère le nombre d'inscrits par sortie et vérifie que notre User est inscrit
@@ -276,10 +330,6 @@ class SortieController extends AbstractController
             }
             return $this->redirectToRoute('sortie_index');
         }
-    }
-
-    private function actionAnnuler(Sortie $sortie)
-    {
     }
 
     //methode qui modifie l'etat d'une sortie pour l'archiver selon certaines conditions
