@@ -31,12 +31,16 @@ class RechercheSortieType extends AbstractType
             ])
             ->add('dateMin', DateType::class, [
                 'label' => 'Entre',
-                'required' => false
+                'required' => false,
+                'html5' => true,
+                'widget' => 'single_text'
             ])
 
             ->add('dateMax', DateType::class, [
                 'label' => 'et',
-                'required' => false
+                'required' => false,
+                'html5' => true,
+                'widget' => 'single_text'
             ])
             ->add('mot', SearchType::class, [
                 'label' => 'Le nom de la sortie contient:',
