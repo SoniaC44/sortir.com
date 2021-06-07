@@ -110,6 +110,9 @@ class SortieController extends AbstractController
                 case 3:
                     $this->actionAnnuler($sortie);
                     break;
+                case 4:
+                    $this->actionPublier($sortie);
+                    break;
                 default:
                     break;
             }
@@ -248,6 +251,31 @@ class SortieController extends AbstractController
             }
         }
         return $this->redirectToRoute('sortie_index');
+    }
+
+    //methode qui met l'etat d'une sortie à "ouverte" si possible
+    private function actionPublier(Sortie $sortie){
+
+        if($sortie->getOrganisateur() == $this->getUser() && $sortie->getEtat()->getId() == 1 ) {
+
+            $dateJour = date_create('now');
+
+            if ( $sortie->getDateHeureDebut() > $dateJour
+                && $sortie->getDateLimiteInscription() > $dateJour) {
+
+                $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
+                $sortie->setEtat($etatRepository->find(2));
+
+                $this->getDoctrine()->getManager()->flush();
+
+                $message = "La sortie : '" . $sortie->getNom() . "' a bien été publiée.";
+                $this->addFlash("success", $message);
+            }else{
+                $message = "La sortie : '" . $sortie->getNom() . "' n'a pas pu être publiée. La date de sortie et/ou la date de clotûre est/sont dépassée/s.";
+                $this->addFlash("danger", $message);
+            }
+            return $this->redirectToRoute('sortie_index');
+        }
     }
 
     private function actionAnnuler(Sortie $sortie)
