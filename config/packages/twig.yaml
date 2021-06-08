@@ -1,3 +1,6 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
     form_theme: ['bootstrap_4_layout.html.twig', 'myBootstrap.html.twig']
+    globals:
+        app_url_api_lieux: '%app_url_api_lieux%'
+        app_url_api_adresse_du_lieu: '%app_url_api_adresse_du_lieu%'

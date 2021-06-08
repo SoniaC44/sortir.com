@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     image_profil_directory: '%kernel.project_dir%/public/uploads/imagesProfil'
+    app_url_api_lieux : '%env(resolve:URL_API_LIEUX)%'
+    app_url_api_adresse_du_lieu : '%env(resolve:URL_API_INFOS_LIEU)%'
 
 services:
     # default configuration for services in *this* file
