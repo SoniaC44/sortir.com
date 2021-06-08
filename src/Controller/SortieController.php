@@ -27,6 +27,8 @@ use Symfony\Component\Security\Core\User\User;
  */
 class SortieController extends AbstractController
 {
+    const ETAT_CLOTURE = "Clôturée";
+
     /**
      * @Route("/", name="sortie_index", methods={"GET","POST"})
      */
@@ -252,16 +254,43 @@ class SortieController extends AbstractController
     // Contrôle de la date limite de clôture des inscriptions + si déjà inscrit
     public function actionSeDesister($sortie) {
 
-        $participants = $sortie->getParticipants();
-        if ($sortie->getDateLimiteInscription() >= date_create('now')->format('Y-m-d H:i:s')) {
-            foreach ($participants as $part) {
-                if ($part == $this->getUser() ) {
-                    $sortie->removeParticipant($this->getUser());
-                    $entityManager = $this->getDoctrine()->getManager();
-                    $entityManager->persist($sortie);
-                    $entityManager->flush();
+        //en premier lieu on vérifie l'etat de la sortie qui doit etre ouverte ou cloturée pour pouvoir se désinscrire
+        if($sortie->getEtat()->getId() == 2 || $sortie->getEtat()->getId() == 3){
+
+            $user = $this->getUser();
+
+            //on vérifie que l'user fait bien parti des participants
+            if($sortie->getParticipants()->contains($user)){
+
+                $sortie->removeParticipant($user);
+
+                //si la date limite d'inscription n'est pas dépassée
+                if ($sortie->getDateLimiteInscription() >= date_create('now')) {
+
+                    //on regarde s'il reste de la place et si l'état etait à cloturée
+                    if($sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()
+                    && $sortie->getEtat()->getLibelle() === self::ETAT_CLOTURE){
+
+                        $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
+                        $sortie->setEtat($etatRepository->find(2));
+                    }
                 }
+
+                $this->getDoctrine()->getManager()->flush();
+
+                $message = "Vous êtes maintenant désinscrit de la sortie : " . $sortie->getNom();
+                $this->addFlash("success", $message);
+
+            }else{
+
+                $message = "Vous n'êtes pas inscrit à la sortie : '" . $sortie->getNom() . "'. Vous ne pouvez donc pas vous désinscrire !";
+                $this->addFlash("danger", $message);
             }
+
+        }else{
+
+            $message = "La sortie : '" . $sortie->getNom() . "' n'est pas dans un état qui permet de se désinscrire !";
+            $this->addFlash("danger", $message);
         }
     }
 
