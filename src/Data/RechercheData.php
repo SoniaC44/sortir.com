@@ -4,6 +4,8 @@
 namespace App\Data;
 
 
+use App\Entity\Campus;
+
 /**
  * Class RechercheData
  * @package App\Data
@@ -13,7 +15,7 @@ class RechercheData
 
     public $mot;
 
-    public $campus;
+    public ?Campus $campus = null;
 
     public $dateMin;
 

@@ -26,8 +26,7 @@ class RechercheSortieType extends AbstractType
                 'class' => Campus::class,
                 'choice_label' => 'nom',
                 'label' => 'Campus :',
-                'required' => false,
-                'empty_data' => $options
+                'required' => false
             ])
             ->add('dateMin', DateType::class, [
                 'label' => 'Entre',

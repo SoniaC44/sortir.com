@@ -27,7 +27,15 @@ class SortieRepository extends ServiceEntityRepository
       */
     public function findByFilters($data): array
     {
-        $queryBuilder = $this->createQueryBuilder('s');
+        $queryBuilder = $this->createQueryBuilder('s')
+        ->join('s.organisateur', 'o')
+        ->addSelect('o')
+        ->join('s.etat', 'e')
+        ->addSelect('e')
+        ->leftJoin('s.participants', 'p')
+        ->addSelect('p')
+        ->andWhere('s.etat != 7' );
+
         if (!empty($data->mot)) {
             $queryBuilder
                 ->andWhere('s.nom LIKE :mot' )

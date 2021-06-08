@@ -94,8 +94,8 @@ class AppFixtures extends Fixture
                 ->setNom($faker->city)
                 ->setRue($faker->streetAddress)
                 ->setVille($this->getReference('ville-'. rand(1,10)))
-                ->setLatitude($faker->latitude)
-                ->setLongitude($faker->longitude);
+                ->setLatitude($faker->latitude(48,49))
+                ->setLongitude($faker->longitude(-1.2,-1.7));
             $this->setReference('lieu-' .$i, $lieu);
             $manager->persist($lieu);
         }

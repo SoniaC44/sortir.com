@@ -36,9 +36,8 @@ class SortieController extends AbstractController
         $data = new RechercheData();
 
 
-        if ($data->campus == null){
-            $data->campus = $campusRepository->find($this->getUser()->getCampus());
-        }
+        $data->campus = $campusRepository->find($this->getUser()->getCampus());
+
         $form = $this->createForm(RechercheSortieType::class, $data);
 
         $form->handleRequest($request);
@@ -46,16 +45,10 @@ class SortieController extends AbstractController
         if ($form->isSubmitted()) {
             $data->user = $this->getUser();
 
-
-            return $this->render('sortie/index.html.twig', [
-                'sorties' => $this->getInscriptions($sortieRepository->findByFilters($data)),
-                'campus' => $campusRepository->findAll(),
-                'form' => $form->createView(),
-            ]);
         }
 
         return $this->render('sortie/index.html.twig', [
-            'sorties' => $this->getInscriptions($sortieRepository->findAll()),
+            'sorties' => $sortieRepository->findByFilters($data),
             'campus' => $campusRepository->findAll(),
             'form' => $form->createView(),
         ]);
@@ -242,7 +235,7 @@ class SortieController extends AbstractController
 
     // Récupère le nombre d'inscrits par sortie et vérifie que notre User est inscrit
     public function getInscriptions($sorties) {
-        foreach ($sorties as $sortie) {
+        /*foreach ($sorties as $sortie) {
             $participants = $sortie->getParticipants();
             $sortie->nbInscrits = $participants->count();
             $sortie->isInscrit = false;
@@ -253,7 +246,7 @@ class SortieController extends AbstractController
                 }
             }
         }
-        return $sorties;
+        return $sorties;*/
     }
 
     // Contrôle de la date limite de clôture des inscriptions + si déjà inscrit
