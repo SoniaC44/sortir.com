@@ -67,15 +67,11 @@ class SortieRepository extends ServiceEntityRepository
 
          if ($data->inscrit) {
             $queryBuilder
-                ->leftJoin('s.participants', 'p')
-                ->addSelect('p')
                 ->andWhere('p.id = :id')
                 ->setParameter('id', $data->user);
         }
         if ($data->nonInscrit) {
             $queryBuilder
-                ->leftJoin('s.participants', 'p')
-                ->addSelect('p')
                 ->andWhere('p.id != :id')
                 ->setParameter('id', $data->user);
         }

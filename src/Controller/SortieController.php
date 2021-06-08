@@ -37,14 +37,12 @@ class SortieController extends AbstractController
 
 
         $data->campus = $campusRepository->find($this->getUser()->getCampus());
-
         $form = $this->createForm(RechercheSortieType::class, $data);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
             $data->user = $this->getUser();
-
         }
 
         return $this->render('sortie/index.html.twig', [
@@ -57,15 +55,19 @@ class SortieController extends AbstractController
     /**
      * @Route("/new", name="sortie_new", methods={"GET","POST"})
      */
-    public function new(Request $request): Response
+    public function new(Request $request, EtatRepository $etatRepository): Response
     {
         $sortie = new Sortie();
         $form = $this->createForm(SortieType::class, $sortie);
         $form->handleRequest($request);
         $sortie->setCampus($this->getUser()->getCampus());
+        $sortie->setEtat($etatRepository->find(6));
+        $sortie->setOrganisateur($this->getUser());
+
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
+
             $entityManager->persist($sortie);
             $entityManager->flush();
 
@@ -93,8 +95,8 @@ class SortieController extends AbstractController
      */
     public function annulerSortie(Request $request, Sortie $sortie, EtatRepository $etatRepository)
     {
-        //il faut être l'organisateur de la sortie pour pouvoir l'annuler ou admin
-        if($sortie->getOrganisateur() == $this->getUser() || $this->getUser()->getAdministrateur())
+        //il faut être l'organisateur de la sortie pour pouvoir l'annuler
+        if($sortie->getOrganisateur() == $this->getUser())
         {
             //on ne peut annuler une sortie que si elle est à ouverte ou cloturée
             if($sortie->getEtat()->getId() == 2 || $sortie->getEtat()->getId() == 3){
@@ -235,7 +237,7 @@ class SortieController extends AbstractController
 
     // Récupère le nombre d'inscrits par sortie et vérifie que notre User est inscrit
     public function getInscriptions($sorties) {
-        /*foreach ($sorties as $sortie) {
+        foreach ($sorties as $sortie) {
             $participants = $sortie->getParticipants();
             $sortie->nbInscrits = $participants->count();
             $sortie->isInscrit = false;
@@ -246,7 +248,7 @@ class SortieController extends AbstractController
                 }
             }
         }
-        return $sorties;*/
+        return $sorties;
     }
 
     // Contrôle de la date limite de clôture des inscriptions + si déjà inscrit

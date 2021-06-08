@@ -6,6 +6,8 @@ use App\Repository\SortieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @ORM\Entity(repositoryClass=SortieRepository::class)
@@ -62,10 +64,28 @@ class Sortie
     private $campus;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Lieu::class, inversedBy="sorties")
+     * @ORM\ManyToOne(targetEntity=Lieu::class, inversedBy="sorties", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $lieu;
+
+    private $nouveauLieu;
+
+    /**
+     * @return mixed
+     */
+    public function getNouveauLieu()
+    {
+        return $this->nouveauLieu;
+    }
+
+    /**
+     * @param mixed $nouveauLieu
+     */
+    public function setNouveauLieu($nouveauLieu): void
+    {
+        $this->nouveauLieu = $nouveauLieu;
+    }
 
     /**
      * @ORM\ManyToMany(targetEntity=Participant::class, inversedBy="sortiesInscrit")
@@ -77,6 +97,8 @@ class Sortie
      * @ORM\JoinColumn(nullable=false)
      */
     private $organisateur;
+
+
 
     public function __construct()
     {
@@ -230,5 +252,16 @@ class Sortie
         $this->organisateur = $organisateur;
 
         return $this;
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context){
+        if (($this->getLieu() == null) && ($this->getNouveauLieu() == null)){
+            $context->buildViolation("Un lieu est obligatoire")
+                ->atPath("lieu")
+                ->addViolation();
+        }
     }
 }
