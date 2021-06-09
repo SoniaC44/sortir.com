@@ -66,7 +66,9 @@ class SortieController extends AbstractController
         $form = $this->createForm(SortieType::class, $sortie);
         $form->handleRequest($request);
         $sortie->setCampus($this->getUser()->getCampus());
+        // Changer provisoire !!!
         $sortie->setEtat($etatRepository->find(6));
+
         $sortie->setOrganisateur($this->getUser());
 
 
