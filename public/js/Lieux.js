@@ -66,18 +66,9 @@ function initAdresse(){
 
     const $optionSelected = $selectLieu.options[$selectLieu.selectedIndex];
 
-    if($optionSelected.dataset.rue === undefined){
-
-        //undefined dans le cas où on choisit un lieu à partir de la même ville
-        // préremplie par symfony à l'ouverture de la page de modification de sortie
-        let idVille = document.getElementById("sortie_ville").value;
-        initLieux(idVille);
-
-    }else{
-        document.getElementById('sortie_rue').value = $optionSelected.dataset.rue;
-        document.getElementById('sortie_longitude').value = $optionSelected.dataset.long;
-        document.getElementById('sortie_latitude').value = $optionSelected.dataset.lat;
-        document.getElementById('sortie_codePostal').value = $optionSelected.dataset.codep;
-    }
+    document.getElementById('sortie_rue').value = $optionSelected.dataset.rue;
+    document.getElementById('sortie_longitude').value = $optionSelected.dataset.long;
+    document.getElementById('sortie_latitude').value = $optionSelected.dataset.lat;
+    document.getElementById('sortie_codePostal').value = $optionSelected.dataset.codep;
 
 }

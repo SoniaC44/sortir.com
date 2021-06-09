@@ -125,6 +125,14 @@ class SortieType extends AbstractType
                 'class' => Lieu::class,
                 'choices' => $lieux,
                 'choice_label' => 'nom',
+                'choice_attr' => function($choice) {
+                    return [
+                        'data-rue' => $choice->getRue(),
+                        'data-lat' => $choice->getLatitude(),
+                        'data-long' => $choice->getLongitude(),
+                        'data-codep' => $choice->getVille()->getCodePostal()
+                    ];
+                },
                 'placeholder' => false,
                 'required' => false,
                 'attr' => ['class' => 'form-select', 'data-rue' => 'test']
