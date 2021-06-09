@@ -44,7 +44,7 @@ class AppFixtures extends Fixture
 
     public function loadEtat(ObjectManager $manager)
     {
-        $etat_name = ['Créée', 'Ouverte', 'Clôturée', 'Activité en cours', 'Activité passée', 'Annulée', 'archivée'];
+        $etat_name = ['Créée', 'Ouverte', 'Clôturée', 'Activité en cours', 'Activité passée', 'Annulée', 'Archivée'];
         foreach ($etat_name as $kn => $name) {
             $etat = new Etat();
             $etat->setLibelle($name);

@@ -48,7 +48,7 @@
         </thead>
         <tbody>
         {% for sortie in sorties %}
-            {% if sortie.etat.id != 7 %}
+            {% if sortie.etat.libelle != "Archivée" %}
             <tr>
                 <td>{{ sortie.nom }}</td>
                 <td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y H:i') : '' }}</td>
@@ -63,19 +63,29 @@
                 </td>
                 <td>
                     <a href="{{ path('sortie_show', {'id': sortie.id}) }}">Afficher</a>
-                    {% if (app.user in sortie.participants) and "now"|date("Y-m-d") < sortie.dateLimiteInscription|date("Y-m-d")  %}
+
+                    {% if (sortie.etat.libelle == "Ouverte" or sortie.etat.libelle == "Clôturée")
+                        and (app.user in sortie.participants)
+                        and date() < sortie.dateLimiteInscription  %}
                         <a href="{{ path('sortie_show', {'id': sortie.id, 'action': 1}) }}">Se désister</a>
                     {% endif %}
-                    {% if not (app.user in sortie.participants) and "now"|date("Y-m-d") < sortie.dateLimiteInscription|date("Y-m-d")  and sortie.organisateur.id != app.user.id %}
+
+                    {% if sortie.etat.libelle == "Ouverte"
+                        and not (app.user in sortie.participants)
+                        and sortie.organisateur.id != app.user.id
+                        and date() < sortie.dateLimiteInscription %}
                         <a href="{{ path('sortie_show', {'id': sortie.id, 'action': 2}) }}">S'inscrire</a>
                     {% endif %}
-                    {% if sortie.etat.id == 1 and sortie.organisateur.id == app.user.id %}
+
+                    {% if sortie.etat.libelle == "Créée"
+                        and sortie.organisateur.id == app.user.id %}
                         <a href="{{ path('sortie_edit', {'id': sortie.id }) }}">Modifier</a> -
                         <a href="{{ path('sortie_show', {'id': sortie.id, 'action': 3 }) }}">Publier</a>
                     {% endif %}
-                    {% if sortie.etat.id == 2
-                        and "now"|date("Y-m-d") < sortie.dateLimiteInscription|date("Y-m-d")
-                        and (sortie.organisateur.id == app.user.id or app.user.administrateur) %}
+
+                    {% if (sortie.etat.libelle == "Ouverte" or sortie.etat.libelle == "Clôturée")
+                        and (sortie.organisateur.id == app.user.id or app.user.administrateur)
+                    %}
                         <a href="{{ path('sortie_cancel', {'id': sortie.id}) }}">Annuler</a>
                     {% endif %}
 
