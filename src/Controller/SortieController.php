@@ -174,6 +174,9 @@ class SortieController extends AbstractController
                 if ($form->isSubmitted() && $form->isValid()) {
                     $this->getDoctrine()->getManager()->flush();
 
+                    $message = "La sortie : '" . $sortie->getNom() . "' a bien été modifiée !";
+                    $this->addFlash("success", $message);
+
                     return $this->redirectToRoute('sortie_index');
                 }
 
@@ -196,16 +199,34 @@ class SortieController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="sortie_delete", methods={"POST"})
+     * @Route("/{id}/delete", name="sortie_delete", methods={"GET"})
      */
     public function delete(Request $request, Sortie $sortie): Response
     {
+        //il faut être l'organisateur de la sortie pour pouvoir la supprimer
        if ($sortie->getOrganisateur() == $this->getUser()) {
-           if ($this->isCsrfTokenValid('delete'.$sortie->getId(), $request->request->get('_token'))) {
+
+           //la sortie doit avoir un certain etat pour être modifiable :
+           if($sortie->getEtat()->getLibelle() == self::ETAT_CREE)
+           {
+               $nomSortie = $sortie->getNom();
+
                $entityManager = $this->getDoctrine()->getManager();
                $entityManager->remove($sortie);
                $entityManager->flush();
+
+               $message = "La sortie : '" . $nomSortie . "' a bien été supprimée !";
+               $this->addFlash("success", $message);
+
+           }else{
+
+               $message = "La sortie : '" . $sortie->getNom() . "' n'est pas dans un état qui permet de la supprimer !";
+               $this->addFlash("danger", $message);
            }
+
+       }else{
+           $message = "Vous ne pouvez pas supprimer une sortie dont vous n'êtes pas l'organisateur !";
+           $this->addFlash("danger", $message);
        }
 
         return $this->redirectToRoute('sortie_index');
