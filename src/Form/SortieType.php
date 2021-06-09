@@ -70,6 +70,7 @@ class SortieType extends AbstractType
             ->add('longitude', TextType::class, [
                 'mapped' =>false,
                 'disabled' => true])
+
             ->add('nouveauLieu', LieuType::class, [
                 'label' => 'Nouveau Lieu',
                 'mapped' => false,
@@ -90,6 +91,7 @@ class SortieType extends AbstractType
         $sortie = $event->getData();
         $nouveauLieu = $event->getForm()->get('nouveauLieu')->getData();
         if (!$sortie->getLieu() && $nouveauLieu) {
+            $nouveauLieu->setVille($event->getForm()->get('ville')->getData());
             $sortie->setLieu($nouveauLieu);
         }
     }
