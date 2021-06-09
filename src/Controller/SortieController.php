@@ -446,22 +446,10 @@ class SortieController extends AbstractController
     //methode qui modifie l'etat d'une sortie pour l'archiver selon certaines conditions
     private function archiverLesSorties(SortieRepository $sortieRepository, EtatRepository $etatRepository){
 
-        $sorties = $sortieRepository->findAll();
-
-        $today = date_create('now');
+        $sorties = $sortieRepository->findAllAArchiver();
 
         foreach($sorties as $sortie) {
-
-            //on archive les sorties terminées ou annulées après un mois
-            if ($sortie->getEtat()->getLibelle() == self::ETAT_PASSEE || $sortie->getEtat()->getLibelle() == self::ETAT_ANNULE) {
-
-                $dateSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d'));
-                $datePlus1Month = date_add($dateSortie, date_interval_create_from_date_string('1 month'));
-
-                if ($datePlus1Month < $today) {
-                    $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Archivée']));
-                }
-            }
+            $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Archivée']));
         }
 
         $this->getDoctrine()->getManager()->flush();
