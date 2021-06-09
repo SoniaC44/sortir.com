@@ -98,6 +98,16 @@ class SortieController extends AbstractController
     }
 
     /**
+     * @Route("/test", name="sortie_test", methods={"GET"})
+     */
+    public function test(SortieRepository $sortieRepository, EtatRepository $etatRepository){
+
+       $this->MettreAJourActivite($sortieRepository, $etatRepository);
+
+        return $this->redirectToRoute('sortie_index');
+    }
+
+    /**
      * @Route("/{id}/cancel", name="sortie_cancel", methods={"GET","POST"})
      */
     public function annulerSortie(Request $request, Sortie $sortie, EtatRepository $etatRepository)
@@ -495,50 +505,40 @@ class SortieController extends AbstractController
 
     private function MettreAJourActivite(SortieRepository $sortieRepository, EtatRepository $etatRepository)
     {
-
-        //TODO à finir !! vérifier les comparaisons de date
-
-        $sorties = $sortieRepository->findAll();
-
-        $maintenant = new DateTime('now');
-        $today = date_create((new DateTime('now'))->format('Y-m-d'));
+        $sorties = $sortieRepository->findAllEtatOuverteOuClotureeDuJour();
 
         foreach ($sorties as $sortie) {
 
-            //pour qu'on modifie l'activité à en cours ou terminée il faut vérifier l'etat
-            //la sortie doit être à ouverte ou cloturée
-            if ($sortie->getEtat()->getLibelle() == self::ETAT_OUVERTE || $sortie->getEtat()->getLibelle() == self::ETAT_CLOTURE) {
+            dump($sortie);
+            $maintenant = new DateTime('now');
 
-                $jourSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d'));
-                $heureSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d HH:mm'));
+            $debutSortie = $sortie->getDateHeureDebut();
 
-                //on compare la date du jour avec la date de sortie
-                if ($jourSortie == $today && $heureSortie < $maintenant) {
+            $intervalString = "PT" . $sortie->getDuree() . "M";
+            $duree = new DateInterval($intervalString);
 
-                    //sortie en cours
-                    $sortie->setEtat($etatRepository->find(4));
-                }
+            $heureFinSortie = date_add($debutSortie, $duree);
+            dump($heureFinSortie);
+            dump($sortie->getDateHeureDebut() < $maintenant && $heureFinSortie > $maintenant);
+            dump($sortie->getDateHeureDebut() < $maintenant);
+            dump($heureFinSortie > $maintenant);
+
+            if ($sortie->getDateHeureDebut() < $maintenant && $heureFinSortie > $maintenant) {
+
+                //sortie en cours
+                $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Activité en cours']));
+
+            }else if($heureFinSortie <= $maintenant){
+
+                //sortie passée
+                $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Activité passée']));
             }
 
-            //l'activité ne doit ni être annulée ni archivée ni non publiée
-            //pour passer à activité terminée si la date de l'activité est passée
-            if ($sortie->getEtat() != 6 && $sortie->getEtat() != 7 && $sortie->getEtat() != 1) {
-
-                $jourSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d'));
-                $debutSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d HH:mm'));
-
-                $intervalString = "PT" . $sortie->getDuree() . "M";
-                $duree = new DateInterval($intervalString);
-
-                $heureFinSortie = date_add($debutSortie, $duree);
-
-                if ($jourSortie < $today || ($jourSortie == $today && $heureFinSortie < $maintenant)) {
-
-                    //sortie en cours
-                    $sortie->setEtat($etatRepository->find(5));
-                }
-
-            }
         }
+        dd($sorties);
+
+        $this->getDoctrine()->getManager()->flush();
     }
+
+
 }

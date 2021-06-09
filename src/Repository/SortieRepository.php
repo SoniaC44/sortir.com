@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Sortie;
 use App\Repository\ParticipantRepository;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -87,6 +88,25 @@ class SortieRepository extends ServiceEntityRepository
     }
 
 
+    /**
+     * @return Sortie[] Returns an array of Sortie objects
+     */
+    public function findAllEtatOuverteOuClotureeDuJour(): array
+    {
+        $queryBuilder = $this->createQueryBuilder('s')
+            ->join('s.etat', 'e')
+            ->addSelect('e')
+            ->Where("e.libelle = 'Ouverte'")
+            ->orWhere("e.libelle = 'Clôturée'")
+            ->andWhere("s.dateHeureDebut >= :date00")
+            ->andWhere("s.dateHeureDebut <= :date2359")
+            ->setParameter('date00', date_time_set(new DateTime('now'),0,0,0))
+            ->setParameter('date2359', date_time_set(new DateTime('now'),23,59,59));
+        ;
+
+        return $queryBuilder->getQuery()->getResult();
+
+    }
     // /**
     //  * @return Sortie[] Returns an array of Sortie objects
     //  */
