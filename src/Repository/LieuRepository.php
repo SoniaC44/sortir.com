@@ -47,4 +47,14 @@ class LieuRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function findAllByVille(int $idVille)
+    {
+        $qb = $this->createQueryBuilder('l')
+            ->where('l.ville = :idVille')
+            ->setParameter('idVille', $idVille);
+
+        $query = $qb->getQuery();
+
+        return $query->execute();
+    }
 }

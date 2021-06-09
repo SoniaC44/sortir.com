@@ -11,8 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 /**
  * @Route("/participant", name="participant_")
@@ -53,6 +51,58 @@ class ParticipantController extends AbstractController
     }
 
     /**
+     * @Route("/profil", name="profil", methods={"GET","POST"})
+     */
+    public function edit(Request $request, UserPasswordEncoderInterface $encoder): Response
+    {
+        $participant = $this->getUser();
+
+        $form = $this->createForm(ParticipantType::class, $participant);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $mdp = $form->get('motDePasse')->getData();
+
+            if($mdp){
+                $hash = $encoder->encodePassword($participant, $mdp);
+                $participant->setPassword($hash);
+            }
+
+            $imageProfil = $form->get('imageProfil')->getData();
+
+            if ($imageProfil) {
+
+                $newFilename = $participant->getId().'.'. $imageProfil->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $imageProfil->move(
+                        $this->getParameter('image_profil_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                $participant->setImageProfil($newFilename);
+            }
+
+            $this->getDoctrine()->getManager()->flush();
+
+            $message = "Votre profil a bien été mis à jour.";
+            $this->addFlash("success", $message);
+
+            return $this->redirectToRoute('main_home');
+        }
+
+        return $this->render('participant/edit.html.twig', [
+            'participant' => $participant,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    /**
      * @Route("/{id}", name="show", methods={"GET"})
      */
     public function show(Participant $participant): Response
@@ -62,60 +112,6 @@ class ParticipantController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{id}/profil", name="profil", methods={"GET","POST"}, requirements={"id"="\d+"})
-     */
-    public function edit(Request $request, Participant $participant, UserPasswordEncoderInterface $encoder, SluggerInterface $slugger): Response
-    {
-        $user = $this->getUser();
-        if($user && $user->getId() == $participant->getId()){
-            $form = $this->createForm(ParticipantType::class, $participant);
-            $form->handleRequest($request);
-
-            if ($form->isSubmitted() && $form->isValid()) {
-
-                $mdp = $form->get('motDePasse')->getData();
-
-                if($mdp){
-                    $hash = $encoder->encodePassword($participant, $mdp);
-                    $participant->setPassword($hash);
-                }
-
-                $imageProfil = $form->get('imageProfil')->getData();
-
-                if ($imageProfil) {
-
-                    $newFilename = $participant->getId().'.'. $imageProfil->guessExtension();
-
-                    // Move the file to the directory where brochures are stored
-                    try {
-                        $imageProfil->move(
-                            $this->getParameter('image_profil_directory'),
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        // ... handle exception if something happens during file upload
-                    }
-
-                    $participant->setImageProfil($newFilename);
-                }
-
-                $this->getDoctrine()->getManager()->flush();
-
-                $message = "Votre profil a bien été mis à jour.";
-                $this->addFlash("success", $message);
-
-                return $this->redirectToRoute('main_home');
-            }
-
-            return $this->render('participant/edit.html.twig', [
-                'participant' => $participant,
-                'form' => $form->createView(),
-            ]);
-        }else{
-            return $this->redirectToRoute('main_home');
-        }
-    }
 
     /**
      * @Route("/{id}", name="delete", methods={"POST"})

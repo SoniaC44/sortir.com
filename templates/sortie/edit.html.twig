@@ -1,13 +1,77 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Sortie{% endblock %}
+{% block title %}Modifier une sortie{% endblock %}
 
-{% block body %}
-    <h1>Edit Sortie</h1>
+{% block main %}
 
-    {{ include('sortie/_form.html.twig', {'button_label': 'Update'}) }}
+<div class=" row col-sm-12 col-lg-10 p-3 justify-content-center">
 
-    <a href="{{ path('sortie_index') }}">back to list</a>
+    <div class="col-12 text-center mb-3">
+        <h1>Modifier une sortie</h1>
+    </div>
 
-    {{ include('sortie/_delete_form.html.twig') }}
+    <div class="col-sm-12 col-lg-8">
+        {{ form_start(form) }}
+        <div class="col-12 row">
+            <div class="col-lg-6">
+                {{ form_label(form.nom) }}
+                {{ form_widget(form.nom) }}
+
+                {{ form_label(form.dateHeureDebut) }}
+                {{ form_widget(form.dateHeureDebut) }}
+
+                {{ form_label(form.dateLimiteInscription) }}
+                {{ form_widget(form.dateLimiteInscription) }}
+
+                {{ form_label(form.nbInscriptionsMax) }}
+                {{ form_widget(form.nbInscriptionsMax) }}
+
+                {{ form_label(form.duree) }}
+                {{ form_widget(form.duree) }}
+
+                {{ form_label(form.infosSortie) }}
+                {{ form_widget(form.infosSortie) }}
+
+            </div>
+
+            <div class="col-lg-6">
+
+                {{ form_label(form.campus) }}
+                {{ form_widget(form.campus) }}
+
+                {{ form_label(form.ville) }}
+                {{  form_widget(form.ville) }}
+
+                {{ form_label(form.lieu) }}
+                {{ form_widget(form.lieu) }}
+
+                {{ form_label(form.rue) }}
+                {{ form_widget(form.rue) }}
+
+                {{ form_label(form.codePostal) }}
+                {{ form_widget(form.codePostal) }}
+
+                {{ form_label(form.latitude) }}
+                {{ form_widget(form.latitude) }}
+
+                {{ form_label(form.longitude) }}
+                {{ form_widget(form.longitude) }}
+
+                <div id="nouveauLieu" style="border: 1px solid grey">
+                    {{ form_label(form.nouveauLieu) }}
+                    {{ form_widget(form.nouveauLieu) }}
+                </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        const url="{{ app_url_api_lieux }}";
+    </script>
+    <script src="{{ asset('js/Lieux.js') }}"></script>
 {% endblock %}
