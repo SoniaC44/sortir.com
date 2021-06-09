@@ -1,30 +1,4 @@
 {{ form_start(form) }}
-
-{{ form_row(form.nom) }}
-{{ form_row(form.dateHeureDebut) }}
-{{ form_row(form.dateLimiteInscription) }}
-{{ form_row(form.nbInscriptionsMax) }}
-{{ form_row(form.duree) }}
-{{ form_row(form.infosSortie) }}
-{{ form_row(form.nouveauLieu) }}
-
-
-<!-- Modal Ajout lieu -->
-<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Enregistrer un nouveau lieu</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <h1>Hello</h1>
-                <button type="button" class="btn ml-2 mt-3" data-dismiss="modal">Annuler</button>
-            </div>
-        </div>
-    </div>
-</div>
-<button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_widget(form.nom) }}
+<button class="btn">{{ button_label|default('Enregistrer') }}</button>
 {{ form_end(form) }}

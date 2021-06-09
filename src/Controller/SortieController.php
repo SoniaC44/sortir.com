@@ -72,7 +72,7 @@ class SortieController extends AbstractController
         $sortie->setOrganisateur($this->getUser());
 
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $entityManager = $this->getDoctrine()->getManager();
 
             $entityManager->persist($sortie);
