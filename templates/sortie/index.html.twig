@@ -3,47 +3,56 @@
 {% block title %}Sortie index{% endblock %}
 
 {% block main %}
-<div class="container">
-    <div class="col align-self-end">
-        <span><strong>Date du jour : {{ "now"|date("d/m/Y") }}</strong></span>
-        <span><strong>Participant : {{ app.user.prenom }} {{ app.user.nom|first }}.</strong></span>
-    </div>
-    <div class="row">
-
-
-        <div class="row col-12 mb-4">
-
-                {{  form_start(form) }}
-                <div class="col">
-                    <div>{{ form_row(form.campus) }}</div>
-                    <div>{{ form_row(form.mot) }}{{ form_row(form.dateMin) }}</div>
-                    <div>{{ form_row(form.dateMax) }}</div>
-                </div>
-                <div class="col">
-                    <div>{{ form_row(form.organisee) }}</div>
-                    <div>{{ form_row(form.inscrit) }}</div>
-                    <div>{{ form_row(form.nonInscrit) }}</div>
-                    <div>{{ form_row(form.passee) }}</div>
-                </div>
-                <div class="col">
-                    <div><button type="submit" class="btn btn-outline-dark">{{ button_label|default('Rechercher') }}</button></div>
-                    {{ form_end(form) }}
-                </div>
-
+    <div class="container">
+        <div class="d-flex align-items-end flex-column">
+            <div class="p-2"><strong>Date du jour : {{ "now"|date("d/m/Y") }}</strong></div>
+            <div class="p-2"><strong>Participant : {{ app.user.prenom }} {{ app.user.nom|first }}.</strong></div>
         </div>
+        <div class="row">
+            <div class=" col-sm">{{  form_start(form) }}
+                <div class="row">
+                    <div class="col">{{ form_label(form.campus) }}</div>
+                    <div class="col">{{ form_widget(form.campus) }}</div>
+                </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col">{{ form_label(form.mot) }} </div>
+                    <div class="col">{{ form_widget(form.mot) }}</div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="col">{{ form_label(form.dateMin) }}</div>
+                        <div class="col"> {{ form_widget(form.dateMin) }}</div>
+                    </div>
+                    <div class="col">
+                        <div class="col">{{ form_label(form.dateMax) }}</div>
+                        <div class="col">{{ form_widget(form.dateMax) }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm ml-4 mr-4">
+                <div>{{ form_row(form.organisee) }}</div>
+                <div>{{ form_row(form.inscrit) }}</div>
+                <div>{{ form_row(form.nonInscrit) }}</div>
+                <div>{{ form_row(form.passee) }}</div>
+            </div>
+            <div class="col-sm">
+                <div><button type="submit" class="btn btn-outline-dark btn-lg">{{ button_label|default('Rechercher') }}</button></div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
 
-
-    <table class="table">
+    <table class="table mt-3 table-bordered">
         <thead>
             <tr>
                 <th>Nom de la sortie</th>
                 <th>Date de la sortie</th>
                 <th>Clôture</th>
-                <th>Inscrits/places</th>
+                <th>Inscrits/Places</th>
                 <th>Etat</th>
                 <th>Inscrit</th>
-                <th>Organisteur</th>
-                <th>actions</th>
+                <th>Organisateur</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -99,8 +108,8 @@
             {% endfor %}
             </tbody>
         </table>
+    <a href="{{ path('sortie_new') }}"><button class="btn btn-outline-dark">Créer une sortie</button></a>
 
-        <a href="{{ path('sortie_new') }}">Créer une sortie</a>
     </div>
-</div>
+
 {% endblock %}
