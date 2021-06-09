@@ -13,7 +13,6 @@ use App\Repository\CampusRepository;
 use App\Repository\EtatRepository;
 use App\Repository\ParticipantRepository;
 use App\Repository\SortieRepository;
-use Cassandra\Date;
 use DateInterval;
 use DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +26,12 @@ use Symfony\Component\Security\Core\User\User;
  */
 class SortieController extends AbstractController
 {
+    const ETAT_CLOTURE = "Clôturée";
+    const ETAT_OUVERTE = "Ouverte";
+    const ETAT_CREE = "Créée";
+    const ETAT_PASSEE = "Activité passée";
+    const ETAT_ANNULE = "Annulée";
+
     /**
      * @Route("/", name="sortie_index", methods={"GET","POST"})
      */
@@ -101,7 +106,7 @@ class SortieController extends AbstractController
         if($sortie->getOrganisateur() == $this->getUser())
         {
             //on ne peut annuler une sortie que si elle est à ouverte ou cloturée
-            if($sortie->getEtat()->getId() == 2 || $sortie->getEtat()->getId() == 3){
+            if($sortie->getEtat()->getLibelle() == self::ETAT_OUVERTE || $sortie->getEtat()->getLibelle() == self::ETAT_CLOTURE){
                 $form = $this->createForm(AnnulerSortieType::class, $sortie);
                 $form->handleRequest($request);
 
@@ -163,7 +168,7 @@ class SortieController extends AbstractController
         if($sortie->getOrganisateur() == $this->getUser())
         {
             //la sortie doit avoir un certain etat pour être modifiable :
-            if($sortie->getEtat()->getId() == 1)
+            if($sortie->getEtat()->getLibelle() == self::ETAT_CREE)
             {
                 $form = $this->createForm(SortieType::class, $sortie);
                 $form->handleRequest($request);
@@ -256,16 +261,43 @@ class SortieController extends AbstractController
     // Contrôle de la date limite de clôture des inscriptions + si déjà inscrit
     public function actionSeDesister($sortie) {
 
-        $participants = $sortie->getParticipants();
-        if ($sortie->getDateLimiteInscription() >= date_create('now')->format('Y-m-d H:i:s')) {
-            foreach ($participants as $part) {
-                if ($part == $this->getUser() ) {
-                    $sortie->removeParticipant($this->getUser());
-                    $entityManager = $this->getDoctrine()->getManager();
-                    $entityManager->persist($sortie);
-                    $entityManager->flush();
+        //en premier lieu on vérifie l'etat de la sortie qui doit etre ouverte ou cloturée pour pouvoir se désinscrire
+        if($sortie->getEtat()->getLibelle() == self::ETAT_OUVERTE || $sortie->getEtat()->getLibelle() == self::ETAT_CLOTURE){
+
+            $user = $this->getUser();
+
+            //on vérifie que l'user fait bien parti des participants
+            if($sortie->getParticipants()->contains($user)){
+
+                $sortie->removeParticipant($user);
+
+                //si la date limite d'inscription n'est pas dépassée
+                if ($sortie->getDateLimiteInscription() >= date_create('now')) {
+
+                    //on regarde s'il reste de la place et si l'état etait à cloturée
+                    if($sortie->getParticipants()->count() < $sortie->getNbInscriptionsMax()
+                    && $sortie->getEtat()->getLibelle() === self::ETAT_CLOTURE){
+
+                        $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
+                        $sortie->setEtat($etatRepository->find(2));
+                    }
                 }
+
+                $this->getDoctrine()->getManager()->flush();
+
+                $message = "Vous êtes maintenant désinscrit de la sortie : " . $sortie->getNom();
+                $this->addFlash("success", $message);
+
+            }else{
+
+                $message = "Vous n'êtes pas inscrit à la sortie : '" . $sortie->getNom() . "'. Vous ne pouvez donc pas vous désinscrire !";
+                $this->addFlash("danger", $message);
             }
+
+        }else{
+
+            $message = "La sortie : '" . $sortie->getNom() . "' n'est pas dans un état qui permet de se désinscrire !";
+            $this->addFlash("danger", $message);
         }
     }
 
@@ -282,7 +314,7 @@ class SortieController extends AbstractController
     private function actionSInscrire(Sortie $sortie){
 
         //en premier lieu on vérifie l'etat de la sortie qui doit etre ouverte pour pouvoir s'inscrire
-        if($sortie->getEtat()->getId() == 2){
+        if($sortie->getEtat()->getLibelle() == self::ETAT_OUVERTE){
             $user = $this->getUser();
 
             //on vérifie que l'user n'est pas déjà inscrit
@@ -345,7 +377,7 @@ class SortieController extends AbstractController
     //methode qui met l'etat d'une sortie à "ouverte" si possible
     private function actionPublier(Sortie $sortie){
 
-        if($sortie->getOrganisateur() == $this->getUser() && $sortie->getEtat()->getId() == 1 ) {
+        if($sortie->getOrganisateur() == $this->getUser() && $sortie->getEtat()->getLibelle() == self::ETAT_CREE ) {
 
             $dateJour = date_create('now');
 
@@ -385,7 +417,7 @@ class SortieController extends AbstractController
         foreach($sorties as $sortie) {
 
             //on archive les sorties terminées ou annulées après un mois
-            if ($sortie->getEtat()->getId() == 5 || $sortie->getEtat()->getId() == 6) {
+            if ($sortie->getEtat()->getLibelle() == self::ETAT_PASSEE || $sortie->getEtat()->getLibelle() == self::ETAT_ANNULE) {
 
                 $dateSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d'));
                 $datePlus1Month = date_add($dateSortie, date_interval_create_from_date_string('1 month'));
@@ -411,7 +443,7 @@ class SortieController extends AbstractController
         foreach($sorties as $sortie)
         {
             //on cloture les sorties ouvertes
-            if($sortie->getEtat()->getId() == 2){
+            if($sortie->getEtat()->getLibelle() == self::ETAT_OUVERTE){
 
                 //on vérifie pour chaque sortie le nombre d'inscrits
                 //normalement vérification faite lors de l'inscription
@@ -447,7 +479,7 @@ class SortieController extends AbstractController
 
             //pour qu'on modifie l'activité à en cours ou terminée il faut vérifier l'etat
             //la sortie doit être à ouverte ou cloturée
-            if ($sortie->getEtat()->getId() == 2 || $sortie->getEtat()->getId() == 3) {
+            if ($sortie->getEtat()->getLibelle() == self::ETAT_OUVERTE || $sortie->getEtat()->getLibelle() == self::ETAT_CLOTURE) {
 
                 $jourSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d'));
                 $heureSortie = date_create($sortie->getDateHeureDebut()->format('Y-m-d HH:mm'));
