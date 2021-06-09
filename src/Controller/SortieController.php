@@ -101,7 +101,7 @@ class SortieController extends AbstractController
     public function annulerSortie(Request $request, Sortie $sortie, EtatRepository $etatRepository)
     {
         //il faut être l'organisateur de la sortie pour pouvoir l'annuler
-        if($sortie->getOrganisateur() == $this->getUser())
+        if($sortie->getOrganisateur() == $this->getUser() || $this->getUser().getAdministrateur())
         {
             //on ne peut annuler une sortie que si elle est à ouverte ou cloturée
             if($sortie->getEtat()->getLibelle() == self::ETAT_OUVERTE || $sortie->getEtat()->getLibelle() == self::ETAT_CLOTURE){
@@ -396,25 +396,32 @@ class SortieController extends AbstractController
     //methode qui met l'etat d'une sortie à "ouverte" si possible
     private function actionPublier(Sortie $sortie){
 
-        if($sortie->getOrganisateur() == $this->getUser() && $sortie->getEtat()->getLibelle() == self::ETAT_CREE ) {
+        if($sortie->getOrganisateur() == $this->getUser()){
 
-            $dateJour = date_create('now');
+            if($sortie->getEtat()->getLibelle() == self::ETAT_CREE){
 
-            if ( $sortie->getDateHeureDebut() > $dateJour
-                && $sortie->getDateLimiteInscription() > $dateJour) {
+                $dateJour = date_create('now');
 
-                $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
-                $sortie->setEtat($etatRepository->find(2));
+                if ( $sortie->getDateHeureDebut() > $dateJour
+                    && $sortie->getDateLimiteInscription() > $dateJour) {
 
-                $this->getDoctrine()->getManager()->flush();
+                    $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
+                    $sortie->setEtat($etatRepository->find(2));
 
-                $message = "La sortie : '" . $sortie->getNom() . "' a bien été publiée.";
-                $this->addFlash("success", $message);
+                    $this->getDoctrine()->getManager()->flush();
 
+                    $message = "La sortie : '" . $sortie->getNom() . "' a bien été publiée.";
+                    $this->addFlash("success", $message);
+
+                }else{
+
+                    $message = "La sortie : '" . $sortie->getNom() . "' n'a pas pu être publiée. La date de sortie et/ou la date de clotûre est/sont dépassée/s.";
+                    $this->addFlash("danger", $message);
+                }
             }else{
-
-                $message = "La sortie : '" . $sortie->getNom() . "' n'a pas pu être publiée. La date de sortie et/ou la date de clotûre est/sont dépassée/s.";
+                $message = "La sortie : '" . $sortie->getNom() . "' n'est pas dans un état qui permette sa publication !";
                 $this->addFlash("danger", $message);
+
             }
 
         }else{
