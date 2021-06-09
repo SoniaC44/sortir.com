@@ -35,11 +35,14 @@ class SortieController extends AbstractController
     /**
      * @Route("/", name="sortie_index", methods={"GET","POST"})
      */
-    public function index( SortieRepository $sortieRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
+    public function index( SortieRepository $sortieRepository, EtatRepository $etatRepository, CampusRepository $campusRepository, ParticipantRepository $participantRepository, Request $request): Response
     {
+        //on met à jour les activités du jour qui ont besoin de l'être
+        $sorties = $sortieRepository->findAllEtatOuverteOuClotureeouEnCoursDuJour();
+        $this->MettreAJourActivite($sorties, $sortieRepository, $etatRepository);
 
+        //puis on affiche la liste des sortie
         $data = new RechercheData();
-
 
         $data->campus = $campusRepository->find($this->getUser()->getCampus());
         $form = $this->createForm(RechercheSortieType::class, $data);
@@ -91,18 +94,13 @@ class SortieController extends AbstractController
      * @Route("/maj", name="sortie_maj", methods={"GET"})
      */
     public function mettreAJourSorties(SortieRepository $sortieRepository, EtatRepository $etatRepository): Response {
+
+        //on met à jour les activités passées qui ont besoin de l'être
+        $sorties = $sortieRepository->findAllEtatOuverteOuClotureeOuEnCours();
+        $this->MettreAJourActivite($sorties, $sortieRepository, $etatRepository);
+
         $this->cloturerLesSorties($sortieRepository, $etatRepository);
         $this->archiverLesSorties($sortieRepository, $etatRepository);
-
-        return $this->redirectToRoute('sortie_index');
-    }
-
-    /**
-     * @Route("/test", name="sortie_test", methods={"GET"})
-     */
-    public function test(SortieRepository $sortieRepository, EtatRepository $etatRepository){
-
-       $this->MettreAJourActivite($sortieRepository, $etatRepository);
 
         return $this->redirectToRoute('sortie_index');
     }
@@ -503,25 +501,19 @@ class SortieController extends AbstractController
         return $this->redirectToRoute('sortie_index');
     }
 
-    private function MettreAJourActivite(SortieRepository $sortieRepository, EtatRepository $etatRepository)
+    //methode qui met à jour l'etat des activités en cours, cloturée ou ouverte
+    private function MettreAJourActivite($sorties, SortieRepository $sortieRepository, EtatRepository $etatRepository)
     {
-        $sorties = $sortieRepository->findAllEtatOuverteOuClotureeDuJour();
-
         foreach ($sorties as $sortie) {
 
-            dump($sortie);
             $maintenant = new DateTime('now');
 
-            $debutSortie = $sortie->getDateHeureDebut();
+            $debutSortie = clone $sortie->getDateHeureDebut();
 
             $intervalString = "PT" . $sortie->getDuree() . "M";
             $duree = new DateInterval($intervalString);
 
             $heureFinSortie = date_add($debutSortie, $duree);
-            dump($heureFinSortie);
-            dump($sortie->getDateHeureDebut() < $maintenant && $heureFinSortie > $maintenant);
-            dump($sortie->getDateHeureDebut() < $maintenant);
-            dump($heureFinSortie > $maintenant);
 
             if ($sortie->getDateHeureDebut() < $maintenant && $heureFinSortie > $maintenant) {
 
@@ -533,9 +525,7 @@ class SortieController extends AbstractController
                 //sortie passée
                 $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Activité passée']));
             }
-
         }
-        dd($sorties);
 
         $this->getDoctrine()->getManager()->flush();
     }

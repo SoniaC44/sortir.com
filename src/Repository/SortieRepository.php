@@ -87,17 +87,33 @@ class SortieRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /**
+     * @return Sortie[] Returns an array of Sortie objects
+     */
+    public function findAllEtatOuverteOuClotureeOuEnCours(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $dql = "SELECT s FROM App\Entity\Sortie s 
+                JOIN s.etat e 
+                WHERE DATE_ADD(s.dateHeureDebut, s.duree, 'MINUTE') < :date 
+                AND (e.libelle = 'Clôturée' OR e.libelle = 'Activité en cours' OR e.libelle = 'Ouverte')";
+        $query = $entityManager->createQuery($dql);
+        $query->setParameter('date', date_time_set(new DateTime('now'),0,0,0));
+
+        return $query->getResult();
+    }
 
     /**
      * @return Sortie[] Returns an array of Sortie objects
      */
-    public function findAllEtatOuverteOuClotureeDuJour(): array
+    public function findAllEtatOuverteOuClotureeouEnCoursDuJour(): array
     {
         $queryBuilder = $this->createQueryBuilder('s')
             ->join('s.etat', 'e')
             ->addSelect('e')
             ->Where("e.libelle = 'Ouverte'")
             ->orWhere("e.libelle = 'Clôturée'")
+            ->orWhere("e.libelle = 'Activité en cours'")
             ->andWhere("s.dateHeureDebut >= :date00")
             ->andWhere("s.dateHeureDebut <= :date2359")
             ->setParameter('date00', date_time_set(new DateTime('now'),0,0,0))
@@ -105,8 +121,8 @@ class SortieRepository extends ServiceEntityRepository
         ;
 
         return $queryBuilder->getQuery()->getResult();
-
     }
+
     // /**
     //  * @return Sortie[] Returns an array of Sortie objects
     //  */
