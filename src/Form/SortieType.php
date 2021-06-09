@@ -106,7 +106,6 @@ class SortieType extends AbstractType
             $form->get('latitude')->setData($lieu->getLatitude());
             $form->get('longitude')->setData($lieu->getLongitude());
             $form->get('codePostal')->setData($lieu->getVille()->getCodePostal());
-
             $form->get('ville')->setData($lieu->getVille());
 
         }
