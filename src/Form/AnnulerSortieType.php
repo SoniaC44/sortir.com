@@ -28,8 +28,8 @@ class AnnulerSortieType extends AbstractType
                     ])
                 ]]
             )
-            ->add('save', SubmitType::class, ['label' => 'Enregistrer','attr' => ['class' => 'btn btn-secondary']])
-            ->add('reset', SubmitType::class, ['label' => 'Annuler','attr' => ['class' => 'btn btn-secondary']])
+            ->add('save', SubmitType::class, ['label' => 'Enregistrer','attr' => ['class' => 'btn btn-outline-dark']])
+            ->add('reset', SubmitType::class, ['label' => 'Annuler','attr' => ['class' => 'btn btn-outline-dark']])
         ;
     }
 
