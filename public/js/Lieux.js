@@ -26,7 +26,7 @@ function initLieux(id_ville){
             .then(response=>response.json())
             .then(response => {
                 $selectLieux = document.getElementById('sortie_lieu');
-                let options="";
+                let options=`<option value="" >Choisir un lieu</option>`;
                 response.map(lieu => {
                     options += `<option value="${lieu.id}" data-rue="${lieu.rue}" data-long="${lieu.longitude}" data-lat="${lieu.latitude}" data-codep="${lieu.codePostal}">${lieu.nom}</option>`;
                 });
@@ -38,7 +38,7 @@ function initLieux(id_ville){
                 }else{
                     //si on a pas d'erreur mais pas de lieux pour la ville
                     //on disabled le select de lieux
-                    $selectLieux.disabled = true;
+                    //$selectLieux.disabled = true;
 
                     //on efface le contenu des inputs
                     document.getElementById('sortie_rue').value = "";
@@ -53,7 +53,7 @@ function initLieux(id_ville){
             });
 
     }else{
-        $selectLieux.disabled = true;
+        //$selectLieux.disabled = true;
         $selectLieux.innerHTML = "";
     }
 

@@ -6,8 +6,10 @@ use App\Entity\Lieu;
 use App\Entity\Sortie;
 use App\Entity\Campus;
 use App\Entity\Ville;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -19,6 +21,13 @@ use Symfony\Component\Validator\Constraints\Valid;
 
 class SortieType extends AbstractType
 {
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $em) {
+
+        $this->em = $em;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -81,6 +90,7 @@ class SortieType extends AbstractType
             ])
         ;
 
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'onSubmit']);
         $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'onPreSetData'));
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'onPostSetData']);
@@ -96,34 +106,73 @@ class SortieType extends AbstractType
         }
     }
 
+    function onPreSubmit(FormEvent $event) {
+
+        $ville = $this->em->getRepository(Ville::class)->find($event->getData()['ville']);
+        $form = $event->getForm();
+        $lieux = $ville ? $ville->getLieux() : [];
+
+        $form->add('lieu', EntityType::class, [
+             'class' => Lieu::class,
+            'choices' => $lieux,
+            'choice_label' => 'nom',
+            'choice_attr' => function($choice) {
+                return [
+                    'data-rue' => $choice->getRue(),
+                    'data-lat' => $choice->getLatitude(),
+                    'data-long' => $choice->getLongitude(),
+                    'data-codep' => $choice->getVille()->getCodePostal()
+                ];
+            },
+            'placeholder' => 'Saisir un lieu',
+            'required' => false,
+            'attr' => ['class' => 'form-select', 'data-rue' => 'test']
+        ]);
+
+        // $form->get('lieu')->getConfig()->getOption('choices');
+
+//        }else{
+//
+//            $form->add('lieu', EntityType::class, [
+//                'class' => Lieu::class,
+//                'choices' => [],
+//                'choice_label' => 'nom',
+//                'placeholder' => false,
+//                'required' => false,
+//                'attr' => ['class' => 'form-select']
+//            ]);
+//
+//        }
+    }
+
     function onPostSetData(FormEvent $event){
-        $sortie = $event->getData();
-        if($sortie && $sortie->getId() !== null){
-            $form = $event->getForm();
+//        $sortie = $event->getData();
+//        if($sortie && $sortie->getId() !== null){
+//            $form = $event->getForm();
+//
+//            $lieu = $sortie->getLieu();
+//            $form->get('rue')->setData($lieu->getRue());
+//            $form->get('latitude')->setData($lieu->getLatitude());
+//            $form->get('longitude')->setData($lieu->getLongitude());
+//            $form->get('codePostal')->setData($lieu->getVille()->getCodePostal());
+//            $form->get('ville')->setData($lieu->getVille());
 
-            $lieu = $sortie->getLieu();
-            $form->get('rue')->setData($lieu->getRue());
-            $form->get('latitude')->setData($lieu->getLatitude());
-            $form->get('longitude')->setData($lieu->getLongitude());
-            $form->get('codePostal')->setData($lieu->getVille()->getCodePostal());
-            $form->get('ville')->setData($lieu->getVille());
-
-        }
+//        }
     }
 
     function onPreSetData(FormEvent $event){
         $sortie = $event->getData();
         $form = $event->getForm();
 
-        if ($sortie && $sortie->getId() !== null ) {
+//        if ($sortie && $sortie->getId() !== null ) {
 
             $lieu = $sortie->getLieu();
-            $ville = $lieu->getVille();
+            $ville = $lieu ? $lieu->getVille() : null;
 
-            $lieux = $ville->getLieux();
+            $lieux = $ville ? $ville->getLieux() : [];
 
-            $form->add('lieu', EntityType::class, [
-                'class' => Lieu::class,
+            $form->add('lieu', ChoiceType::class, [
+               // 'class' => Lieu::class,
                 'choices' => $lieux,
                 'choice_label' => 'nom',
                 'choice_attr' => function($choice) {
@@ -134,25 +183,25 @@ class SortieType extends AbstractType
                         'data-codep' => $choice->getVille()->getCodePostal()
                     ];
                 },
-                'placeholder' => false,
+                'placeholder' => 'Saisir un lieu',
                 'required' => false,
                 'attr' => ['class' => 'form-select', 'data-rue' => 'test']
             ]);
 
-            $form->get('lieu')->getConfig()->getOption('choices');
+           // $form->get('lieu')->getConfig()->getOption('choices');
 
-        }else{
-
-            $form->add('lieu', EntityType::class, [
-                'class' => Lieu::class,
-                'choices' => [],
-                'choice_label' => 'nom',
-                'placeholder' => false,
-                'required' => false,
-                'attr' => ['class' => 'form-select']
-            ]);
-
-        }
+//        }else{
+//
+//            $form->add('lieu', EntityType::class, [
+//                'class' => Lieu::class,
+//                'choices' => [],
+//                'choice_label' => 'nom',
+//                'placeholder' => false,
+//                'required' => false,
+//                'attr' => ['class' => 'form-select']
+//            ]);
+//
+//        }
     }
 
     public function configureOptions(OptionsResolver $resolver)
