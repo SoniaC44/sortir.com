@@ -23,26 +23,35 @@ class Sortie
 
     /**
      * @ORM\Column(type="string", length=50)
+     * @Assert\Length(max=50, maxMessage="Le nom de la sortie ne doit pas dépasser 50 caractères !")
+     * @Assert\NotBlank(message="Veuillez saisir un nom de sortie valide !")
      */
     private $nom;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Assert\NotBlank(message="Veuillez saisir une date de sortie valide jj/mm/aaaa HH:mm")
+     * @Assert\Type(type="DateTimeInterface", message="Veuillez saisir une date de sortie valide jj/mm/aaaa HH:mm")
      */
     private $dateHeureDebut;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
+     * @Assert\Positive(message="Si vous saisissez une durée, saisissez alors une durée de sortie supérieur à 0")
      */
     private $duree;
 
     /**
      * @ORM\Column(type="date")
+     * @Assert\NotBlank(message="Veuillez saisir une date de limite d'inscription valide jj/mm/aaaa")
+     * @Assert\Type(type="DateTimeInterface", message="Veuillez saisir une date de limite d'inscription valide jj/mm/aaaa")
      */
     private $dateLimiteInscription;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\NotBlank(message="Veuillez saisir un nombre d'inscription maximum")
+     * @Assert\Positive(message="Veuillez saisir un nombre d'inscription maximum supérieur à 0")
      */
     private $nbInscriptionsMax;
 

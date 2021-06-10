@@ -10,57 +10,115 @@
         <h1>Modifier une sortie</h1>
     </div>
 
-    <div class="col-sm-12 col-lg-8">
+    <div class="col-sm-12 col-lg-10">
         {{ form_start(form) }}
+        {{ form_errors(form) }}
         <div class="col-12 row">
             <div class="col-sm-12 col-lg-6">
-                {{ form_label(form.nom) }}
-                {{ form_widget(form.nom) }}
 
-                {{ form_label(form.dateHeureDebut) }}
-                {{ form_widget(form.dateHeureDebut) }}
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.nom) }}</div>
+                    <div class="col-sm-12 col-lg-7">{{ form_widget(form.nom) }}</div>
+                </div>
 
-                {{ form_label(form.dateLimiteInscription) }}
-                {{ form_widget(form.dateLimiteInscription) }}
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.dateHeureDebut) }}</div>
+                    <div class="col-sm-12 col-lg-7">{{ form_widget(form.dateHeureDebut) }}</div>
+                </div>
 
-                {{ form_label(form.nbInscriptionsMax) }}
-                {{ form_widget(form.nbInscriptionsMax) }}
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.dateLimiteInscription) }}</div>
+                    <div class="col-sm-12 col-lg-7">{{ form_widget(form.dateLimiteInscription) }}</div>
+                </div>
 
-                {{ form_label(form.duree) }}
-                {{ form_widget(form.duree) }}
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.nbInscriptionsMax) }}</div>
+                    <div class="col-sm-12 col-lg-7">{{ form_widget(form.nbInscriptionsMax) }}</div>
+                </div>
 
-                {{ form_label(form.infosSortie) }}
-                {{ form_widget(form.infosSortie) }}
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.duree) }}</div>
+                    <div class="col-sm-12 col-lg-7">{{ form_widget(form.duree) }}</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.infosSortie) }}</div>
+                    <div class="col-sm-12 col-lg-7">{{ form_widget(form.infosSortie) }}</div>
+                </div>
 
             </div>
 
             <div class="col-sm-12 col-lg-6">
 
-                {{ form_label(form.campus) }}
-                {{ form_widget(form.campus) }}
-
-                {{ form_label(form.ville) }}
-                {{  form_widget(form.ville) }}
-
-                {{ form_label(form.lieu) }}
-                {{ form_widget(form.lieu) }}
-
-                {{ form_label(form.rue) }}
-                {{ form_widget(form.rue) }}
-
-                {{ form_label(form.codePostal) }}
-                {{ form_widget(form.codePostal) }}
-
-                {{ form_label(form.latitude) }}
-                {{ form_widget(form.latitude) }}
-
-                {{ form_label(form.longitude) }}
-                {{ form_widget(form.longitude) }}
-
-                <div id="nouveauLieu" style="border: 1px solid grey">
-                    {{ form_label(form.nouveauLieu) }}
-                    {{ form_widget(form.nouveauLieu) }}
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.campus) }}</div>
+                    <div class="col-sm-12 col-lg-7">{{ form_widget(form.campus) }}</div>
                 </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.ville) }}</div>
+                    <div class="col-sm-12 col-lg-7">{{ form_widget(form.ville) }}</div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.lieu) }}</div>
+                    <div class="col-sm-12 col-lg-7 row">
+                        <div class="col-sm-12 col-lg-10">{{ form_widget(form.lieu) }}</div>
+                        <div class="col-sm-12 col-lg-2">
+                            <button type="button" class="btn btn-outline-dark" id="btnPlus">➕</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-2 py-3 px-2" id="nouveauLieu" style="border: 1px solid grey; display: none ">
+
+                    <div class="row mb-2">
+                        <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.nouveauLieu.nom) }}</div>
+                        <div class="col-sm-12 col-lg-7">{{ form_widget(form.nouveauLieu.nom) }}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.nouveauLieu.rue) }}</div>
+                        <div class="col-sm-12 col-lg-7">{{ form_widget(form.nouveauLieu.rue) }}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.nouveauLieu.latitude) }}</div>
+                        <div class="col-sm-12 col-lg-7">{{ form_widget(form.nouveauLieu.latitude) }}</div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.nouveauLieu.longitude) }}</div>
+                        <div class="col-sm-12 col-lg-7">{{ form_widget(form.nouveauLieu.longitude, {'attr': {'id': 'sortie_lieu_longitude'}}) }}</div>
+                    </div>
+
+                    <div id="map" style="width: 100%; height: 20%;"></div>
+                </div>
+
+                <div class="row mb-2" id="ancienLieu" style="display: block">
+
+                    <div class="row mb-2 m-0 p-0">
+                        <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.rue) }}</div>
+                        <div class="col-sm-12 col-lg-7">{{ form_widget(form.rue) }}</div>
+                    </div>
+
+                    <div class="row mb-2 m-0 p-0">
+                        <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.codePostal) }}</div>
+                        <div class="col-sm-12 col-lg-7">{{ form_widget(form.codePostal) }}</div>
+                    </div>
+
+                    <div class="row mb-2 m-0 p-0">
+                        <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.latitude) }}</div>
+                        <div class="col-sm-12 col-lg-7">{{ form_widget(form.latitude) }}</div>
+                    </div>
+
+                    <div class="row mb-2 m-0 p-0">
+                        <div class="col-sm-12 col-lg-5 libelle">{{ form_label(form.longitude) }}</div>
+                        <div class="col-sm-12 col-lg-7">{{ form_widget(form.longitude) }}</div>
+                    </div>
+
+                </div>
+
             </div>
             <div class="row mt-3">
                 <div class="col-12 d-flex justify-content-center">
@@ -88,4 +146,23 @@
         const url="{{ app_url_api_lieux }}";
     </script>
     <script src="{{ asset('js/Lieux.js') }}"></script>
+    <script type="application/javascript">
+        let marker;
+
+        window.addEventListener("DOMContentLoaded", function () {
+            mapboxgl.accessToken = 'pk.eyJ1IjoiYmFsYnV6YXJkIiwiYSI6ImNrcGR2eHBwMTFyc3MybnA3NWpkaGVjZWIifQ.68J9NxbIMvEWHFgRXma62g';
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11',
+                zoom: 9,
+                minZoom: 1,
+                center: [{{ sortie.lieu.longitude }}, {{ sortie.lieu.latitude }}]
+            });
+
+            marker = new mapboxgl.Marker({
+                color: "#FF5555",
+                draggable: false
+            }).setLngLat([{{ sortie.lieu.longitude }}, {{ sortie.lieu.latitude }}]).addTo(map);
+        })
+    </script>
 {% endblock %}

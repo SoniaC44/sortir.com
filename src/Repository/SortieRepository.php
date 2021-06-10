@@ -106,6 +106,22 @@ class SortieRepository extends ServiceEntityRepository
     /**
      * @return Sortie[] Returns an array of Sortie objects
      */
+    public function findAllAArchiver(): array
+    {
+        $entityManager = $this->getEntityManager();
+        $dql = "SELECT s FROM App\Entity\Sortie s 
+                JOIN s.etat e 
+                WHERE DATE_ADD(s.dateHeureDebut, 1, 'MONTH') < :date 
+                AND (e.libelle = 'Annulée' OR e.libelle = 'Activité passée')";
+        $query = $entityManager->createQuery($dql);
+        $query->setParameter('date', date_time_set(new DateTime('now'),0,0,0));
+
+        return $query->getResult();
+    }
+
+    /**
+     * @return Sortie[] Returns an array of Sortie objects
+     */
     public function findAllEtatOuverteOuClotureeouEnCoursDuJour(): array
     {
         $queryBuilder = $this->createQueryBuilder('s')

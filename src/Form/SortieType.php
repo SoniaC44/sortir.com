@@ -146,18 +146,18 @@ class SortieType extends AbstractType
     }
 
     function onPostSetData(FormEvent $event){
-//        $sortie = $event->getData();
-//        if($sortie && $sortie->getId() !== null){
-//            $form = $event->getForm();
-//
-//            $lieu = $sortie->getLieu();
-//            $form->get('rue')->setData($lieu->getRue());
-//            $form->get('latitude')->setData($lieu->getLatitude());
-//            $form->get('longitude')->setData($lieu->getLongitude());
-//            $form->get('codePostal')->setData($lieu->getVille()->getCodePostal());
-//            $form->get('ville')->setData($lieu->getVille());
+        $sortie = $event->getData();
+        if($sortie && $sortie->getId() !== null){
+            $form = $event->getForm();
 
-//        }
+            $lieu = $sortie->getLieu();
+            $form->get('rue')->setData($lieu->getRue());
+            $form->get('latitude')->setData($lieu->getLatitude());
+            $form->get('longitude')->setData($lieu->getLongitude());
+            $form->get('codePostal')->setData($lieu->getVille()->getCodePostal());
+            $form->get('ville')->setData($lieu->getVille());
+
+        }
     }
 
     function onPreSetData(FormEvent $event){

@@ -15,23 +15,28 @@
              <div class="row col-12 mb-2">
                  <div class="col-sm-12 col-lg-5 libelle">Nom de la sortie :</div>
                  <div class="col-sm-12 col-lg-7">{{ form_widget(form.nom) }}</div>
+                 <div>{{ form_errors(form.nom) }}</div>
              </div>
              <div class="row col-12 mb-2">
                  <div class="col-sm-12 col-lg-5 libelle">Date et heure de la sortie :</div>
                  <div class="col-sm-12 col-lg-7">{{ form_widget(form.dateHeureDebut) }}</div>
+                 <div>{{ form_errors(form.dateHeureDebut) }}</div>
              </div>
              <div class="row col-12 mb-2">
                  <div class="col-sm-12 col-lg-5 libelle">Date limite d'inscription :</div>
                  <div class="col-sm-12 col-lg-7">{{ form_widget(form.dateLimiteInscription) }}</div>
+                 <div>{{ form_errors(form.dateLimiteInscription) }}</div>
              </div>
              <div class="row col-12 mb-2">
                  <div class="col-sm-12 col-lg-5 libelle">Nombre de places :</div>
                  <div class="col-sm-12 col-lg-4"> {{ form_widget(form.nbInscriptionsMax) }}</div>
+                 <div>{{ form_errors(form.nbInscriptionsMax) }}</div>
              </div>
              <div class="row col-12 mb-2">
                  <div class="col-sm-12 col-lg-5 libelle">Durée :</div>
                  <div class="col-sm-12 col-lg-2">{{ form_widget(form.duree) }}</div>
                  <div class="col-sm-12 col-lg-5"> minutes</div>
+                 <div>{{ form_errors(form.duree) }}</div>
              </div>
              <div class="row col-12 mb-2">
                  <div class="col-sm-12 col-lg-5 libelle">Description et infos :</div>
@@ -50,8 +55,8 @@
                      <div class="row col-12 mb-2">
                          <div class="col-sm-12 col-lg-5 libelle">Lieu :</div>
                          <div class="col-sm-12 col-lg-6"> {{ form_widget(form.lieu) }}</div>
-                         <div>{{ form_errors(form.lieu) }}</div>
                          <button type="button" class=" btn col-sm-12 col-lg-1" id="btnPlus">➕</button>
+                         <div>{{ form_errors(form.lieu) }}</div>
                      </div>
                      <div id="nouveauLieu" style="border: 1px solid grey; display: none ">
                          {{ form_label(form.nouveauLieu.nom) }}

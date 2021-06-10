@@ -75,6 +75,7 @@ class SortieController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
+              //  dd($form);
             $entityManager->persist($sortie);
             $entityManager->flush();
 
