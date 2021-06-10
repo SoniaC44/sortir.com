@@ -144,25 +144,9 @@
     {{ parent() }}
     <script>
         const url="{{ app_url_api_lieux }}";
+        let $lat = {{ sortie.lieu.latitude }};
+        let $long = {{ sortie.lieu.longitude }};
     </script>
     <script src="{{ asset('js/Lieux.js') }}"></script>
-    <script type="application/javascript">
-        let marker;
-
-        window.addEventListener("DOMContentLoaded", function () {
-            mapboxgl.accessToken = 'pk.eyJ1IjoiYmFsYnV6YXJkIiwiYSI6ImNrcGR2eHBwMTFyc3MybnA3NWpkaGVjZWIifQ.68J9NxbIMvEWHFgRXma62g';
-            const map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/streets-v11',
-                zoom: 9,
-                minZoom: 1,
-                center: [{{ sortie.lieu.longitude }}, {{ sortie.lieu.latitude }}]
-            });
-
-            marker = new mapboxgl.Marker({
-                color: "#FF5555",
-                draggable: false
-            }).setLngLat([{{ sortie.lieu.longitude }}, {{ sortie.lieu.latitude }}]).addTo(map);
-        })
-    </script>
+    <script src="{{ asset('js/MapBox.js') }}"></script>
 {% endblock %}
