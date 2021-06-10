@@ -69,17 +69,17 @@ class SortieController extends AbstractController
         $form = $this->createForm(SortieType::class, $sortie);
         $form->handleRequest($request);
         $sortie->setCampus($this->getUser()->getCampus());
-        // Changer provisoire !!!
-        $sortie->setEtat($etatRepository->find(6));
-
+        $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Créée']));
         $sortie->setOrganisateur($this->getUser());
 
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-              //  dd($form);
             $entityManager->persist($sortie);
             $entityManager->flush();
+
+            $message = "La sortie ". $sortie->getNom(). " a bien été créée";
+            $this->addFlash("success", $message);
 
             return $this->redirectToRoute('sortie_index');
         }
