@@ -30,6 +30,13 @@ body{
     border: 1px solid grey;
     height : 250px;
 }
+.wrapper_sortie {
+    overflow:hidden;
+    overflow-y: scroll;
+    // change this to desired height
+    border: 1px solid grey;
+    height : 400px;
+}
 .wrapper table{
     border-collapse: collapse;
     /*min-height: 250px;*/
