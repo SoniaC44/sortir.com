@@ -13,14 +13,25 @@ function init(){
     $selectLieu.addEventListener("change",() => {
         initAdresse();
     });
+
+    //ajout evenement click sur bouton+
+    document.getElementById("btnPlus").onclick = function() {
+
+        if (document.getElementById("nouveauLieu").style.display === "none"){
+            document.getElementById("nouveauLieu").style.display = "block";
+            document.getElementById("ancienLieu").style.display = "none";
+        } else {
+            document.getElementById("nouveauLieu").style.display = "none";
+            document.getElementById("ancienLieu").style.display = "block";
+        }
+    }
 }
 
 function initLieux(id_ville){
 
     const $selectVille = document.getElementById("sortie_ville");
-    let $selectLieux = document.getElementById('sortie_lieu');
 
-    //si valeur choisie = "choisir une ville"
+    //si valeur choisie != "choisir une ville"
     if($selectVille.options[$selectVille.selectedIndex].value !== ""){
         fetch(url + '/' + id_ville, {'method':'GET'})
             .then(response=>response.json())
@@ -32,20 +43,7 @@ function initLieux(id_ville){
                 });
                 $selectLieux.innerHTML = options;
 
-                //si on a récupéré des lieux ( on a rempli options !)
-                if(options !== ""){
-                    initAdresse();
-                }else{
-                    //si on a pas d'erreur mais pas de lieux pour la ville
-                    //on disabled le select de lieux
-                    //$selectLieux.disabled = true;
-
-                    //on efface le contenu des inputs
-                    document.getElementById('sortie_rue').value = "";
-                    document.getElementById('sortie_longitude').value = "";
-                    document.getElementById('sortie_latitude').value = "";
-                    document.getElementById('sortie_codePostal').value = "";
-                }
+                initAdresse();
 
             })
             .catch(e=>{
@@ -53,8 +51,10 @@ function initLieux(id_ville){
             });
 
     }else{
-        //$selectLieux.disabled = true;
-        $selectLieux.innerHTML = "";
+
+        document.getElementById('sortie_lieu').innerHTML = "";
+        //on efface le contenu des inputs
+        viderContenu();
     }
 
 }
@@ -62,13 +62,27 @@ function initLieux(id_ville){
 function initAdresse(){
 
     const $selectLieu = document.getElementById("sortie_lieu");
-    $selectLieu.disabled = false;
 
     const $optionSelected = $selectLieu.options[$selectLieu.selectedIndex];
 
-    document.getElementById('sortie_rue').value = $optionSelected.dataset.rue;
-    document.getElementById('sortie_longitude').value = $optionSelected.dataset.long;
-    document.getElementById('sortie_latitude').value = $optionSelected.dataset.lat;
-    document.getElementById('sortie_codePostal').value = $optionSelected.dataset.codep;
+    if($optionSelected !== undefined){
 
+        if($optionSelected.dataset.rue !== undefined){
+            document.getElementById('sortie_rue').value = $optionSelected.dataset.rue;
+            document.getElementById('sortie_longitude').value = $optionSelected.dataset.long;
+            document.getElementById('sortie_latitude').value = $optionSelected.dataset.lat;
+            document.getElementById('sortie_codePostal').value = $optionSelected.dataset.codep;
+        }else{
+            //on efface le contenu des inputs
+            viderContenu();
+        }
+    }
+}
+
+function viderContenu(){
+
+    document.getElementById('sortie_rue').value = "";
+    document.getElementById('sortie_longitude').value = "";
+    document.getElementById('sortie_latitude').value = "";
+    document.getElementById('sortie_codePostal').value = "";
 }
