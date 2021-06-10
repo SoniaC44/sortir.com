@@ -51,13 +51,13 @@ class SortieRepository extends ServiceEntityRepository
         }
         if (!empty($data->dateMin)) {
             $queryBuilder
-                ->andWhere('s.dateHeureDebut <= :date' )
-                ->setParameter('date', $data->dateMin) ;
+                ->andWhere('s.dateHeureDebut >= :date' )
+                ->setParameter('date', $data->dateMin->format('Y-m-d')) ;
         }
         if (!empty($data->dateMax)) {
             $queryBuilder
-                ->andWhere('s.dateHeureDebut >= :date' )
-                ->setParameter('date', $data->dateMax) ;
+                ->andWhere('s.dateHeureDebut <= :date' )
+                ->setParameter('date', $data->dateMax->format('Y-m-d')) ;
         }
         //cases à cocher
         if ($data->passee) {
