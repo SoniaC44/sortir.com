@@ -71,7 +71,9 @@
                     <a href="{{ path('participant_show', {'id': sortie.organisateur.id}) }}"> {{ sortie.organisateur.prenom }} {{ sortie.organisateur.nom|first }}. </a>
                 </td>
                 <td>
-                    <a href="{{ path('sortie_show', {'id': sortie.id}) }}">Afficher</a>
+                    {% if (sortie.etat.libelle != "Créée") %}
+                        <a href="{{ path('sortie_show', {'id': sortie.id}) }}">Afficher</a>
+                    {% endif %}
 
                     {% if (sortie.etat.libelle == "Ouverte" or sortie.etat.libelle == "Clôturée")
                         and (app.user in sortie.participants)
