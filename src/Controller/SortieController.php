@@ -134,7 +134,7 @@ class SortieController extends AbstractController
 
                             if($motif){
 
-                                $sortie->setEtat($etatRepository->find(6));
+                                $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Annulée']));
                                 $sortie->setInfosSortie($motif);
 
                                 $this->getDoctrine()->getManager()->flush();
@@ -308,7 +308,7 @@ class SortieController extends AbstractController
                     && $sortie->getEtat()->getLibelle() === self::ETAT_CLOTURE){
 
                         $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
-                        $sortie->setEtat($etatRepository->find(2));
+                        $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Ouverte']));
                     }
                 }
 
@@ -371,7 +371,7 @@ class SortieController extends AbstractController
                             if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax()){
 
                                 $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
-                                $sortie->setEtat($etatRepository->find(3));
+                                $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Clôturée']));
                             }
 
                             $this->getDoctrine()->getManager()->flush();
@@ -416,7 +416,7 @@ class SortieController extends AbstractController
                     && $sortie->getDateLimiteInscription() > $dateJour) {
 
                     $etatRepository = $this->getDoctrine()->getRepository(Etat::class);
-                    $sortie->setEtat($etatRepository->find(2));
+                    $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Ouverte']));
 
                     $this->getDoctrine()->getManager()->flush();
 
@@ -473,13 +473,13 @@ class SortieController extends AbstractController
                 //normalement vérification faite lors de l'inscription
                 if($sortie->getParticipants()->count() == $sortie->getNbInscriptionsMax())
                 {
-                    $sortie->setEtat($etatRepository->find(3));
+                    $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Archivée']));
                 }
 
                 //si le nombre d'inscrits est inférieur au nombre max on vérifie la date limite
                 if($sortie->getDateLimiteInscription() < $today )
                 {
-                    $sortie->setEtat($etatRepository->find(3));
+                    $sortie->setEtat($etatRepository->findOneBy(['libelle' => 'Archivée']));
                 }
             }
         }
